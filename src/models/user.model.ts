@@ -4,9 +4,11 @@ export interface UserType {
     name: string;
     email: string;
     hashedPassword: string;
+    about?: string;
+    photo?: string;
 }
 
-const UserSchema = new Schema(
+const UserSchema = new Schema<UserType>(
     {
         name: {
             type: String,
@@ -22,6 +24,14 @@ const UserSchema = new Schema(
         hashedPassword: {
             type: String,
             required: [true, "Password is required"],
+        },
+        photo: {
+            data: Buffer,
+            type: String,
+        },
+        about: {
+            type: String,
+            trim: true,
         },
     },
     {

@@ -51,7 +51,7 @@ export class UserController {
             next(error);
         }
     };
-
+    // [x] TODO:“Modify the user update controller in the backend to process the uploaded photo”
     updateById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             //if user not found throw an error or update the user
@@ -65,14 +65,22 @@ export class UserController {
                 return next(error);
             }
 
-            const { name } = req.body as Partial<UserType>;
+            // Extract fields from request body
+            const { name, about, photo } = req.body as Partial<UserType>;
+            const updateData: Partial<UserType> = {};
 
-            //if they are equal, update the user and return the updated user
+            // Add fields to updateData only if they are provided in the request body
+            if (name) updateData.name = name;
+            if (about) updateData.about = about;
+            if (photo) updateData.photo = photo;
+
+            // Update the user with the provided fields
             const updatedUser = await this.userService.findByIdAndUpdate(
                 req.params.userId,
-                { name },
+                updateData,
             );
 
+            // Return the updated user data
             res.status(200).json(updatedUser);
         } catch (e) {
             next(e);
