@@ -1,7 +1,7 @@
 import User, { UserType } from "../models/user.model";
 
 export class UserRepository {
-    public async create(user: UserType) {
+    public async create(user: Partial<UserType>) {
         return await User.create(user);
     }
     public async update(userId: string, payload: Partial<UserType>) {

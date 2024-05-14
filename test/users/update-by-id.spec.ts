@@ -8,9 +8,11 @@ const BASE_URL = "/users/";
 import User from "../../src/models/user.model";
 import { Config } from "../../src/config";
 import RefreshToken from "../../src/models/refresh.token.model";
+import multer from "multer";
 const userService = makeUserService();
-
+import fs from "fs";
 let user: any;
+
 describe("UPDATE /users/:userId", () => {
     beforeAll(async () => {
         await db.connect();
@@ -110,10 +112,42 @@ describe("UPDATE /users/:userId", () => {
 
             expect(result.body.name).toBe("updated_name");
         });
+
+        it("should update user with file", async () => {
+            const userId = user?._id.toString();
+            const accessToken = await getAccessToken(userId);
+
+            const response = await api
+                .patch(`${BASE_URL}/${user?._id.toString()}`)
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .attach("file", `${__dirname}/test-data/test-pic.png`)
+                .expect(200);
+
+            const savedUser = await User.findById(userId);
+
+            expect(savedUser?.avatar?.data).toBeInstanceOf(Buffer); // Verify that the file was uploaded
+            expect(savedUser?.avatar?.contentType).toBe("image/png");
+        }, 100000);
+
+        it("should update description , if present", async () => {
+            const userId = user?._id.toString();
+            const accessToken = await getAccessToken(userId);
+            const about = "updated_description";
+            const result = await api
+                .patch(`${BASE_URL}/${userId}`)
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .send({
+                    about,
+                })
+                .expect("Content-Type", /json/)
+                .expect(200);
+
+            expect(result.body.about).toBe(about);
+        });
     });
 });
 
-const createUser = async () => {
+export const createUser = async () => {
     const usr = {
         name: "test",
         email: "test@gmail.com",

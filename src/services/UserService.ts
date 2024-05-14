@@ -1,7 +1,8 @@
 import createHttpError from "http-errors";
 import { UserRepository } from "../repositories/UserRepository";
 import { EncryptionService } from "./EncryptionService";
-import { UserType } from "../models/user.model";
+import { PhotoType, UserType } from "../models/user.model";
+import fs from "fs";
 
 export class UserService {
     constructor(
@@ -9,6 +10,31 @@ export class UserService {
         private readonly userRepository: UserRepository,
     ) {}
 
+    async findByIdAndUpdateAvatar(
+        userId: string,
+        filePath: string,
+        contentType: string,
+    ) {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
+        user.avatar = {
+            data: filePath,
+            contentType,
+        } as unknown as PhotoType;
+
+        //delete file
+        fs.unlinkSync(filePath);
+
+        const savedUser = await user.save();
+
+        return savedUser;
+    }
     async findUserById(userId: string) {
         const user = await this.userRepository.findById(userId);
         return user;
@@ -72,7 +98,7 @@ export class UserService {
             ));
 
         if (!validUser) {
-            const error = createHttpError(400, "UserName or Password Invalid");
+            const error = createHttpError(400, "Email or Password Invalid");
             throw error;
         }
 

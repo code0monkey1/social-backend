@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from "express";
-import { UserController } from "../controllers/user/UserController";
 import authenticate from "../middleware/authenticate";
-import { makeUserService } from "../factories/services/user-service-factory";
-import { makeTokenService } from "../factories/services/token-service-factory";
 import { hasAuthorization } from "../middleware/hasAuthorization";
+import multer from "multer";
+import { makeUserController } from "../factories/controllers/user/user-controller-factory";
 
 const route = Router();
-const userService = makeUserService();
-const tokenService = makeTokenService();
 
-const userController = new UserController(userService, tokenService);
+const userController = makeUserController();
+
+const upload = multer({ dest: "uploads/" });
 
 route.get("/:userId", authenticate, hasAuthorization, userController.findById);
 
@@ -18,6 +17,7 @@ route.patch(
     "/:userId",
     authenticate,
     hasAuthorization,
+    upload.single("file"),
     userController.updateById,
 );
 

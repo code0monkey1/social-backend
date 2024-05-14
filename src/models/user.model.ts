@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Schema, model } from "mongoose";
+
+export interface PhotoType {
+    data: Buffer;
+    contentType: string;
+}
+
 export interface UserType {
     name: string;
     email: string;
     hashedPassword: string;
     about?: string;
-    photo?: string;
+    avatar?: PhotoType;
 }
 
 const UserSchema = new Schema<UserType>(
@@ -25,13 +31,14 @@ const UserSchema = new Schema<UserType>(
             type: String,
             required: [true, "Password is required"],
         },
-        photo: {
-            data: Buffer,
-            type: String,
-        },
         about: {
             type: String,
             trim: true,
+            default: "",
+        },
+        avatar: {
+            data: { type: Buffer, default: null },
+            contentType: { type: String, default: null },
         },
     },
     {

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { UserService } from "../../services/UserService";
 import { UserType } from "../../models/user.model";
 import { TokenService } from "../../services/TokenService";
-
+import fs from "fs";
 export class UserController {
     constructor(
         private readonly userService: UserService,
@@ -51,6 +53,7 @@ export class UserController {
             next(error);
         }
     };
+
     // [x] TODO:“Modify the user update controller in the backend to process the uploaded photo”
     updateById = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -65,14 +68,23 @@ export class UserController {
                 return next(error);
             }
 
-            // Extract fields from request body
-            const { name, about, photo } = req.body as Partial<UserType>;
+            const { name, about } = req.body as Partial<UserType>;
             const updateData: Partial<UserType> = {};
 
             // Add fields to updateData only if they are provided in the request body
             if (name) updateData.name = name;
             if (about) updateData.about = about;
-            if (photo) updateData.photo = photo;
+
+            if (req.file) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                updateData.avatar = {
+                    data: fs.readFileSync(req.file.path),
+                    contentType: req.file.mimetype,
+                };
+
+                //delete file
+                fs.unlinkSync(req.file.path);
+            }
 
             // Update the user with the provided fields
             const updatedUser = await this.userService.findByIdAndUpdate(

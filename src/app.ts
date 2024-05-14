@@ -6,6 +6,8 @@ import authRouter from "./routes/authentication-routes";
 import userRouter from "./routes/user-routes";
 import cookieParse from "cookie-parser";
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+
 const cookieParser = cookieParse();
 
 app.use(express.json());

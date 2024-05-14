@@ -1,6 +1,6 @@
-🧑‍💻 Checklist for feature functionality
+🧑‍💻 Checklist for social features to be implemented
 
--   [ ] User profile with a description and a photo
+-   [x] User profile with a description and a photo
 -   [ ] Users following each other
 -   [ ] Who to follow suggestions
 -   [ ] Posting messages with photos
