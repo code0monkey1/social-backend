@@ -7,6 +7,8 @@ import userRouter from "./routes/user-routes";
 import cookieParse from "cookie-parser";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+// Save the original append method
+// eslint-disable-next-line @typescript-eslint/unbound-method
 
 const cookieParser = cookieParse();
 
