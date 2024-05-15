@@ -83,6 +83,22 @@ describe("UPDATE /users/:userId", () => {
                 })
                 .expect(400);
         });
+
+        it("should not permit uploading non-image files for profile pic", async () => {
+            const userId = user?._id.toString();
+            const accessToken = await getAccessToken(userId);
+
+            await api
+                .patch(`${BASE_URL}/${user?._id.toString()}`)
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .attach("file", `${__dirname}/test-data/fake-text-pic.png`)
+                .expect(400);
+
+            const savedUser = await User.findById(userId);
+
+            expect(savedUser?.avatar?.data).toBeNull(); // Verify that the file was uploaded
+            expect(savedUser?.avatar?.contentType).toBe(null);
+        }, 100000);
     });
 
     describe("happy path", () => {
@@ -113,7 +129,7 @@ describe("UPDATE /users/:userId", () => {
             expect(result.body.name).toBe("updated_name");
         });
 
-        it("should update user with file", async () => {
+        it("should update user with profile pic", async () => {
             const userId = user?._id.toString();
             const accessToken = await getAccessToken(userId);
 

@@ -4,6 +4,7 @@ import authenticate from "../middleware/authenticate";
 import { hasAuthorization } from "../middleware/hasAuthorization";
 import multer from "multer";
 import { makeUserController } from "../factories/controllers/user/user-controller-factory";
+import { parseImage } from "../middleware/parseImage";
 
 const route = Router();
 
@@ -18,6 +19,7 @@ route.patch(
     authenticate,
     hasAuthorization,
     upload.single("file"),
+    parseImage,
     userController.updateById,
 );
 

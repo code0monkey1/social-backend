@@ -54,11 +54,8 @@ export class UserController {
         }
     };
 
-    // [x] TODO:“Modify the user update controller in the backend to process the uploaded photo”
     updateById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            //if user not found throw an error or update the user
-
             const userOrError = await this.userService.findById(
                 req.params.userId,
             );
@@ -71,12 +68,10 @@ export class UserController {
             const { name, about } = req.body as Partial<UserType>;
             const updateData: Partial<UserType> = {};
 
-            // Add fields to updateData only if they are provided in the request body
             if (name) updateData.name = name;
             if (about) updateData.about = about;
 
             if (req.file) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                 updateData.avatar = {
                     data: fs.readFileSync(req.file.path),
                     contentType: req.file.mimetype,
@@ -86,13 +81,11 @@ export class UserController {
                 fs.unlinkSync(req.file.path);
             }
 
-            // Update the user with the provided fields
             const updatedUser = await this.userService.findByIdAndUpdate(
                 req.params.userId,
                 updateData,
             );
 
-            // Return the updated user data
             res.status(200).json(updatedUser);
         } catch (e) {
             next(e);

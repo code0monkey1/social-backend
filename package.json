@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon src/server.ts",
-        "test": "jest --watchAll --runInBand --coverage",
+        "test": "node --experimental-vm-modules node_modules/.bin/jest --watchAll --runInBand --coverage",
         "format:check": "prettier . --check",
         "format:fix": "prettier . --write",
         "test:prod": "jest --runInBand",
@@ -16,6 +16,8 @@
     "author": "Chiranjeev Thomas",
     "license": "ISC",
     "devDependencies": {
+        "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+        "@babel/preset-env": "^7.24.5",
         "@types/bcrypt": "^5.0.2",
         "@types/cookie-parser": "^1.4.7",
         "@types/express": "^4.17.21",
@@ -60,6 +62,7 @@
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.3.2",
         "multer": "^1.4.5-lts.1",
+        "validate-image-type": "^3.0.0",
         "winston": "^3.12.0"
     }
 }
