@@ -66,7 +66,7 @@ export class UserService {
 
     async findAll() {
         const users = await this.userRepository.findAll();
-        return users.map((user) => {
+        return users.map((user: UserType) => {
             return {
                 name: user.name,
             };
@@ -75,7 +75,6 @@ export class UserService {
 
     async findById(userId: string) {
         const user = await this.userRepository.findById(userId);
-
         return user;
     }
 

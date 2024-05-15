@@ -2,8 +2,9 @@ import express, { NextFunction, Request, Response } from "express";
 import logger from "./config/logger";
 import { HttpError } from "http-errors";
 const app = express();
-import authRouter from "./routes/authentication-routes";
+import authRouter from "./routes/auth-routes";
 import userRouter from "./routes/user-routes";
+import selfRouter from "./routes/self-routes";
 import cookieParse from "cookie-parser";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -20,6 +21,8 @@ app.use("/auth", authRouter);
 
 app.use("/users", userRouter);
 
+app.use("/self", selfRouter);
+
 app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
@@ -31,7 +34,7 @@ app.use(
                 {
                     type: error.name,
                     message: error.message,
-                    stack: error.stack,
+                    stack: "",
                     path: "",
                     location: "",
                 },

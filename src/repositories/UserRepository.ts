@@ -15,7 +15,7 @@ export class UserRepository {
         return await User.findByIdAndDelete(userId);
     }
     public async findById(userId: string) {
-        return await User.findById(userId);
+        return await User.findById(userId).select("-avatar");
     }
     public async findAll() {
         return await User.find();

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Schema, model } from "mongoose";
-
+import getDefaultProfileImageAndType from "../helpers";
 export interface PhotoType {
     data: Buffer;
     contentType: string;
@@ -13,6 +13,9 @@ export interface UserType {
     about?: string;
     avatar?: PhotoType;
 }
+// the file is 1 directory up in pics with the name profile-default.svg
+const { defaultImageBuffer, defaultImageType } =
+    getDefaultProfileImageAndType();
 
 const UserSchema = new Schema<UserType>(
     {
@@ -37,8 +40,8 @@ const UserSchema = new Schema<UserType>(
             default: "",
         },
         avatar: {
-            data: { type: Buffer, default: null },
-            contentType: { type: String, default: null },
+            data: { type: Buffer, default: defaultImageBuffer },
+            contentType: { type: String, default: defaultImageType },
         },
     },
     {

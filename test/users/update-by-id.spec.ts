@@ -1,3 +1,4 @@
+import { UserType } from "./../../src/models/user.model";
 import jwt from "jsonwebtoken";
 import supertest from "supertest";
 import app from "../../src/app";
@@ -82,9 +83,18 @@ describe("UPDATE /users/:userId", () => {
                 .expect(400);
         });
 
-        it("should not permit uploading non-image files for profile pic", async () => {
+        it("should not permit uploading non-image files for profile pic ", async () => {
             const userId = user?._id.toString();
             const accessToken = await getAccessToken(userId);
+
+            const {
+                avatar: { data: dataBefore, contentType: contentTypeBefore },
+            } = (await User.findById(userId)) as {
+                avatar: {
+                    data: Buffer;
+                    contentType: string;
+                };
+            };
 
             await api
                 .patch(`${BASE_URL}/${user?._id.toString()}`)
@@ -92,10 +102,21 @@ describe("UPDATE /users/:userId", () => {
                 .attach("file", `${__dirname}/test-data/fake-text-pic.png`)
                 .expect(400);
 
-            const savedUser = await User.findById(userId);
+            const {
+                avatar: { data: dataAfter, contentType: contentTypeAfter },
+            } = (await User.findById(userId)) as {
+                avatar: {
+                    data: Buffer;
+                    contentType: string;
+                };
+            };
+            expect(dataBefore).toBeTruthy();
+            expect(dataAfter).toBeTruthy();
 
-            expect(savedUser?.avatar?.data).toBeNull(); // Verify that the file was uploaded
-            expect(savedUser?.avatar?.contentType).toBe(null);
+            expect(Buffer.compare(dataBefore!, dataAfter!)).toBe(0);
+            expect(Buffer.compare(dataBefore!, dataAfter!)).toBe(0);
+
+            expect(contentTypeBefore).toBe(contentTypeAfter);
         }, 100000);
     });
 

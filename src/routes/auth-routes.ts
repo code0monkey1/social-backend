@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from "express";
 import { makeAuthController } from "../factories/controllers/auth/auth-controller-factory";
-
 import registerValidator from "../validators/register-validator";
 import loginValidator from "../validators/login-validator";
 import authenticate from "../middleware/authenticate";
