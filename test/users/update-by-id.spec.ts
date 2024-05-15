@@ -8,9 +8,7 @@ const BASE_URL = "/users/";
 import User from "../../src/models/user.model";
 import { Config } from "../../src/config";
 import RefreshToken from "../../src/models/refresh.token.model";
-import multer from "multer";
 const userService = makeUserService();
-import fs from "fs";
 let user: any;
 
 describe("UPDATE /users/:userId", () => {

@@ -3,3 +3,4 @@ node_modules
 .eslintrc.cjs
 jest.config.js
 test
+coverage

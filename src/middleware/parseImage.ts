@@ -27,6 +27,7 @@ export const parseImage = async (
         if (!result.ok) {
             //delete file:
             fs.unlinkSync(_req.file.path);
+
             throw createHttpError(400, "Invalid file type");
         }
 

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { UserService } from "../../services/UserService";
