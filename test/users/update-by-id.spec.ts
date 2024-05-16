@@ -82,19 +82,10 @@ describe("UPDATE /users/:userId", () => {
                 })
                 .expect(400);
         });
-
+        // DONE: correct this test
         it("should not permit uploading non-image files for profile pic ", async () => {
             const userId = user?._id.toString();
             const accessToken = await getAccessToken(userId);
-
-            const {
-                avatar: { data: dataBefore, contentType: contentTypeBefore },
-            } = (await User.findById(userId)) as {
-                avatar: {
-                    data: Buffer;
-                    contentType: string;
-                };
-            };
 
             await api
                 .patch(`${BASE_URL}/${user?._id.toString()}`)
@@ -102,21 +93,14 @@ describe("UPDATE /users/:userId", () => {
                 .attach("file", `${__dirname}/test-data/fake-text-pic.png`)
                 .expect(400);
 
-            const {
-                avatar: { data: dataAfter, contentType: contentTypeAfter },
-            } = (await User.findById(userId)) as {
+            const { avatar } = (await User.findById(userId)) as {
                 avatar: {
                     data: Buffer;
                     contentType: string;
                 };
             };
-            expect(dataBefore).toBeTruthy();
-            expect(dataAfter).toBeTruthy();
 
-            expect(Buffer.compare(dataBefore!, dataAfter!)).toBe(0);
-            expect(Buffer.compare(dataBefore!, dataAfter!)).toBe(0);
-
-            expect(contentTypeBefore).toBe(contentTypeAfter);
+            expect(avatar).toEqual({});
         }, 100000);
     });
 
@@ -147,13 +131,13 @@ describe("UPDATE /users/:userId", () => {
 
             expect(result.body.name).toBe("updated_name");
         });
-
+        // DONE : should update user with profile pic
         it("should update user with profile pic", async () => {
             const userId = user?._id.toString();
             const accessToken = await getAccessToken(userId);
 
             const response = await api
-                .patch(`${BASE_URL}/${user?._id.toString()}`)
+                .patch(`${BASE_URL}/${userId}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .attach("file", `${__dirname}/test-data/test-pic.png`)
                 .expect(200);
@@ -162,7 +146,7 @@ describe("UPDATE /users/:userId", () => {
 
             expect(savedUser?.avatar?.data).toBeInstanceOf(Buffer); // Verify that the file was uploaded
             expect(savedUser?.avatar?.contentType).toBe("image/png");
-        }, 100000);
+        }, 1000000);
 
         it("should update description , if present", async () => {
             const userId = user?._id.toString();

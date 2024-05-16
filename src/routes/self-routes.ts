@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { NextFunction, Router, Request, Response } from "express";
-import User, { PhotoType } from "../models/user.model";
 import authenticate from "../middleware/authenticate";
 import { AuthRequest } from "../controllers/auth/AuthController";
-import createHttpError from "http-errors";
+import { makeUserService } from "../factories/services/user-service-factory";
+import getDefaultProfileImageAndType from "../helpers";
 
 const route = Router();
 
@@ -16,21 +16,30 @@ route.get(
                 auth: { userId },
             } = req as AuthRequest;
 
-            const user = await User.findById(userId);
+            const userService = makeUserService();
 
-            if (!user) {
-                const error = createHttpError(
-                    404,
-                    `User with ${userId} does not exist`,
-                );
-                return next(error);
+            const { _id } = await userService.findUserById(userId);
+
+            const avatar = await userService.getUserAvatar(_id.toString());
+
+            if (!avatar?.data) {
+                return next();
             }
-
-            const { avatar } = (await User.findById(userId)) as {
-                avatar: PhotoType;
-            };
-
+            res.set("Content-Type", avatar.contentType);
             res.json(avatar.data);
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { defaultImageBuffer, defaultImageType } =
+                getDefaultProfileImageAndType();
+
+            res.set("Content-Type", defaultImageType);
+
+            res.send(defaultImageBuffer);
         } catch (e) {
             next(e);
         }

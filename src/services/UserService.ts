@@ -16,6 +16,7 @@ export class UserService {
         contentType: string,
     ) {
         const user = await this.userRepository.findById(userId);
+
         if (!user) {
             const error = createHttpError(
                 404,
@@ -23,6 +24,7 @@ export class UserService {
             );
             throw error;
         }
+
         user.avatar = {
             data: filePath,
             contentType,
@@ -37,8 +39,20 @@ export class UserService {
     }
     async findUserById(userId: string) {
         const user = await this.userRepository.findById(userId);
-        return user;
+
+        if (!user) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
+
+        const { email, name, about, _id } = user;
+
+        return { email, name, about, _id };
     }
+
     async createUser(name: string, email: string, password: string) {
         const hashedPassword = await this.encryptionService.hash(password);
 
@@ -47,6 +61,7 @@ export class UserService {
             email,
             hashedPassword,
         });
+
         return user;
     }
 
@@ -75,6 +90,13 @@ export class UserService {
 
     async findById(userId: string) {
         const user = await this.userRepository.findById(userId);
+        if (!user) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
         return user;
     }
 
@@ -83,6 +105,14 @@ export class UserService {
         payload: Omit<Partial<UserType>, "password">,
     ) {
         const user = await this.userRepository.update(userId, payload);
+
+        if (!user) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
         return user;
     }
 
@@ -102,5 +132,23 @@ export class UserService {
         }
 
         return user;
+    }
+
+    async getUserAvatar(userId: string) {
+        const user = await this.userRepository.findById(userId);
+
+        if (!user) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
+
+        const { avatar } = (await this.userRepository.findById(userId)) as {
+            avatar: PhotoType;
+        };
+
+        return avatar;
     }
 }

@@ -4,6 +4,7 @@ import { createAccessToken, createUser } from "../auth/helper";
 import { UserRepository } from "../../src/repositories/UserRepository";
 import { db } from "../../src/utils/db";
 import User, { PhotoType } from "../../src/models/user.model";
+import getDefaultProfileImageAndType from "../../src/helpers";
 const api = supertest(app);
 const BASE_URL = "/self/avatar";
 
@@ -20,8 +21,8 @@ describe("GET /self/avatar", () => {
         await db.disconnect();
     });
     describe("happy path", () => {
-        // TODO: fix this test
-        it.skip("should return avatar data as null ,if avatar not created ", async () => {
+        // DONE : fixed test
+        it("should return default avatar and image type if avatar not present ", async () => {
             const user = {
                 name: "test",
                 email: "test@gmail.com",
@@ -30,18 +31,22 @@ describe("GET /self/avatar", () => {
 
             const savedUser = await createUser(user);
             const accessToken = await createAccessToken(savedUser);
+
+            const { defaultImageBuffer, defaultImageType } =
+                getDefaultProfileImageAndType();
 
             // the content type should be image/png
             const response = await api
                 .get(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .expect("Content-Type", /json/)
+                .expect("Content-Type", `${defaultImageType}`)
                 .expect(200);
 
-            expect(response.body).toBeNull();
+            expect(Buffer.compare(response.body, defaultImageBuffer)).toBe(0);
         });
-        // TODO: fix this test
-        it.skip("should return avatar data and content type if avatar is created ", async () => {
+
+        // DONE: fix this test
+        it("should return avatar and image type if avatar present", async () => {
             const user = {
                 name: "test",
                 email: "test@gmail.com",
@@ -51,9 +56,10 @@ describe("GET /self/avatar", () => {
             const savedUser = await createUser(user);
             const accessToken = await createAccessToken(savedUser);
 
-            //update avatar data
+            // the data should be of Buffer type from file
+            const file = `${__dirname}/test-pic.png`;
             const avatar = {
-                data: Buffer.from("../users/test-data/test-pic.png", "base64"),
+                data: Buffer.from(file),
                 contentType: "image/png",
             } as PhotoType;
 
@@ -63,7 +69,7 @@ describe("GET /self/avatar", () => {
             const response = await api
                 .get(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .expect("Content-Type", `image/png; charset=utf-8`)
+                .expect("Content-Type", "image/png; charset=utf-8")
                 .expect(200);
 
             expect(response.body).toBeInstanceOf(Buffer);

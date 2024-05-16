@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import createHttpError from "http-errors";
 import { UserService } from "../../services/UserService";
 import { UserType } from "../../models/user.model";
 import { TokenService } from "../../services/TokenService";
@@ -21,6 +20,7 @@ export class UserController {
 
     deleteById = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            // delete user by id
             await this.userService.deleteById(req.params.userId);
 
             // delete all refreshTokens of user
@@ -38,14 +38,6 @@ export class UserController {
         try {
             const user = await this.userService.findById(req.params.userId);
 
-            if (!user) {
-                const error = createHttpError(
-                    404,
-                    `User with ${req.params.userId} does not exist`,
-                );
-                return next(error);
-            }
-
             res.status(200).json(user);
         } catch (error) {
             next(error);
@@ -54,15 +46,6 @@ export class UserController {
 
     updateById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userOrError = await this.userService.findById(
-                req.params.userId,
-            );
-
-            if (!userOrError) {
-                const error = createHttpError(404, "User not found");
-                return next(error);
-            }
-
             const { name, about } = req.body as Partial<UserType>;
             const updateData: Partial<UserType> = {};
 
