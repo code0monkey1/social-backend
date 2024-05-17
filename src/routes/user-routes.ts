@@ -32,6 +32,11 @@ route.delete(
     userController.deleteById,
 );
 
-route.put("/:userId/follow", authenticate, userController.follow);
+route.put(
+    "/:userId/follow",
+    authenticate,
+    userController.addFollowing,
+    userController.addFollower,
+);
 
 export default route;

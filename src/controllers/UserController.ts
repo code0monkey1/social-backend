@@ -12,7 +12,7 @@ export class UserController {
         private readonly tokenService: TokenService,
     ) {}
 
-    follow = async (req: Request, res: Response, next: NextFunction) => {
+    addFollowing = async (req: Request, _res: Response, next: NextFunction) => {
         try {
             const _req = req as AuthRequest;
 
@@ -20,7 +20,23 @@ export class UserController {
 
             const { userId: followId } = req.params;
 
-            await this.userService.follow(userId, followId);
+            await this.userService.addFollowing(userId, followId);
+
+            next();
+        } catch (e) {
+            next(e);
+        }
+    };
+
+    addFollower = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as AuthRequest;
+
+            const { userId } = _req.auth;
+
+            const { userId: followId } = req.params;
+
+            await this.userService.addFollower(userId, followId);
 
             res.json();
         } catch (e) {

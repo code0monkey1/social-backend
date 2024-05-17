@@ -157,9 +157,8 @@ export class UserService {
         return avatar;
     }
 
-    async follow(userId: string, followId: string) {
+    async addFollowing(userId: string, followId: string) {
         const user = await this.userRepository.findById(userId);
-        const userToFollow = await this.userRepository.findById(followId);
 
         if (!user) {
             const error = createHttpError(
@@ -177,6 +176,12 @@ export class UserService {
             user.following?.push(followId);
         }
 
+        await user.save();
+    }
+
+    addFollower = async (userId: string, followId: string) => {
+        const userToFollow = await this.userRepository.findById(followId);
+
         if (!userToFollow) {
             const error = createHttpError(
                 404,
@@ -192,8 +197,6 @@ export class UserService {
         if (!userToFollow.followers?.includes(userId)) {
             userToFollow.followers?.push(userId);
         }
-
-        await user.save();
         await userToFollow.save();
-    }
+    };
 }
