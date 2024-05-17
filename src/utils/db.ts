@@ -2,11 +2,22 @@
 import mongoose from "mongoose";
 import { Config } from "../config";
 import logger from "../config/logger";
+import { MongoMemoryServer } from "mongodb-memory-server";
+let mockDbUrl: string;
+let mockDb: MongoMemoryServer;
 
 export const db = {
     connect: async () => {
         try {
-            await mongoose.connect(Config.MONGODB_URI!);
+            if (Config.NODE_ENV === "test") {
+                mockDb = await MongoMemoryServer.create();
+                mockDbUrl = mockDb.getUri();
+            }
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            await mongoose.connect(
+                Config.NODE_ENV === "test" ? mockDbUrl : Config.MONGODB_URI!,
+            );
 
             logger.info("✅ MongoDb connected!");
         } catch (error) {
@@ -15,6 +26,14 @@ export const db = {
     },
 
     disconnect: async () => {
-        await mongoose.disconnect();
+        try {
+            await mongoose.connection.dropDatabase();
+            await mongoose.disconnect();
+
+            if (mockDb) await mockDb.stop();
+        } catch (error) {
+            if (error instanceof Error)
+                logger.error(`error connecting from MongoDB: ${error.message}`);
+        }
     },
 };
