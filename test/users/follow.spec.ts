@@ -13,7 +13,7 @@ import User from "../../src/models/user.model";
 const api = supertest(app);
 const BASE_URL = "/users";
 
-describe("PUT /users/:userId/follow", () => {
+describe("PATCH /users/:userId/follow", () => {
     beforeAll(async () => {
         await db.connect();
     });
@@ -30,7 +30,7 @@ describe("PUT /users/:userId/follow", () => {
         it("should return json response ", async () => {
             const userId = 12;
             await api
-                .put(`${BASE_URL}/${userId}/follow`)
+                .patch(`${BASE_URL}/${userId}/follow`)
                 .expect("Content-Type", /json/);
         });
 
@@ -45,7 +45,7 @@ describe("PUT /users/:userId/follow", () => {
             const accessToken = await createAccessToken(user);
 
             await api
-                .put(`${BASE_URL}/${userToFollow._id}/follow`)
+                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect("Content-Type", /json/)
                 .expect(200);
@@ -71,7 +71,7 @@ describe("PUT /users/:userId/follow", () => {
             const accessToken = await createAccessToken(user);
 
             await api
-                .put(`${BASE_URL}/${userToFollow._id}/follow`)
+                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect("Content-Type", /json/)
                 .expect(200);
@@ -101,7 +101,7 @@ describe("PUT /users/:userId/follow", () => {
             await savedUser!.save();
 
             await api
-                .put(`${BASE_URL}/${userToFollow._id}/follow`)
+                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect("Content-Type", /json/)
                 .expect(200);
@@ -119,7 +119,7 @@ describe("PUT /users/:userId/follow", () => {
             });
 
             await api
-                .put(`${BASE_URL}/${userToFollow._id}/follow`)
+                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
                 .expect("Content-Type", /json/)
                 .expect(401);
         });
@@ -138,7 +138,7 @@ describe("PUT /users/:userId/follow", () => {
             const accessToken = await createAccessToken(savedUser);
 
             await api
-                .put(`${BASE_URL}/${userToFollow._id.toString()}/follow`)
+                .patch(`${BASE_URL}/${userToFollow._id.toString()}/follow`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect("Content-Type", /json/)
                 .expect(404);

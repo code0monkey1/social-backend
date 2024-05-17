@@ -32,7 +32,7 @@ route.delete(
     userController.deleteById,
 );
 
-route.put(
+route.patch(
     "/:userId/follow",
     authenticate,
     userController.addFollowing,
