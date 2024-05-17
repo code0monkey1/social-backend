@@ -1,12 +1,11 @@
+import { createUser, userData } from "./../testHelpers/index";
 import { db } from "../../src/utils/db";
 import supertest from "supertest";
 import app from "../../src/app";
-import bcrypt from "bcrypt";
 const api = supertest(app);
 import { UserRepository } from "../../src/repositories/UserRepository";
-import User from "../../src/models/user.model";
-import RefreshToken from "../../src/models/refresh.token.model";
 import { isJwt } from "../../src/utils/index";
+import { clearDb } from "../testHelpers";
 const BASE_URL = "/auth/login";
 let userRepository: UserRepository;
 
@@ -18,8 +17,7 @@ describe("POST /auth/login", () => {
 
     afterEach(async () => {
         // delete all users created
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
+        await clearDb();
     });
 
     afterAll(async () => {
@@ -30,19 +28,14 @@ describe("POST /auth/login", () => {
     describe("when data is valid", () => {
         it("should return refreshToken and accessToken cookies inside response objects", async () => {
             //arrange
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "test",
-            };
 
-            await userRepository.create({
-                ...user,
-                hashedPassword: await bcrypt.hash(user.password, 10),
-            });
+            await createUser(userData);
 
             //act
-            const response = await api.post(BASE_URL).send(user).expect(201);
+            const response = await api
+                .post(BASE_URL)
+                .send(userData)
+                .expect(201);
 
             interface Headers {
                 ["set-cookie"]: string[];
@@ -79,29 +72,22 @@ describe("POST /auth/login", () => {
 
         it("should return status 400 when  password not sent in request body", async () => {
             //arrange
-
-            const user = {
-                email: "vonnaden@gmail.com",
-            };
-
             //act
             //assert
-            await api.post(BASE_URL).send(user).expect(400);
+            await api
+                .post(BASE_URL)
+                .send({
+                    email: "vonnaden@gmail.com",
+                })
+                .expect(400);
         });
 
         it("should return 400 if email is not registered ", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "test",
-            };
-            await userRepository.create({
-                ...user,
-                hashedPassword: await bcrypt.hash(user.password, 10),
-            });
+            await createUser(userData);
+
             await api
                 .post(BASE_URL)
-                .send({ ...user, email: "other_email@gmail.com" })
+                .send({ ...userData, email: "other_email@gmail.com" })
                 .expect(400);
 
             const users = await userRepository.findAll();
@@ -111,18 +97,11 @@ describe("POST /auth/login", () => {
         });
 
         it("should return 400 if password is incorrect ", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "test",
-            };
-            await userRepository.create({
-                ...user,
-                hashedPassword: await bcrypt.hash(user.password, 10),
-            });
+            await createUser(userData);
+
             await api
                 .post(BASE_URL)
-                .send({ ...user, password: "other_password" })
+                .send({ ...userData, password: "other_password" })
                 .expect(400);
 
             const users = await userRepository.findAll();

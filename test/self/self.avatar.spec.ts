@@ -1,10 +1,10 @@
 import supertest from "supertest";
 import app from "../../src/app";
-import { createAccessToken, createUser } from "../auth/helper";
 import { UserRepository } from "../../src/repositories/UserRepository";
 import { db } from "../../src/utils/db";
 import User, { PhotoType } from "../../src/models/user.model";
 import getDefaultProfileImageAndType from "../../src/helpers";
+import { createAccessToken, createUser, userData } from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/self/avatar";
 
@@ -23,13 +23,7 @@ describe("GET /self/avatar", () => {
     describe("happy path", () => {
         // DONE : fixed test
         it("should return default avatar and image type if avatar not present ", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
             const accessToken = await createAccessToken(savedUser);
 
             const { defaultImageBuffer, defaultImageType } =
@@ -47,19 +41,14 @@ describe("GET /self/avatar", () => {
 
         // DONE: fix this test
         it("should return avatar and image type if avatar present", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
             const accessToken = await createAccessToken(savedUser);
 
             // the data should be of Buffer type from file
-            const file = `${__dirname}/test-pic.png`;
+            const fileBuffer = Buffer.from(`${__dirname}/test-pic.png`);
+
             const avatar = {
-                data: Buffer.from(file),
+                data: fileBuffer,
                 contentType: "image/png",
             } as PhotoType;
 
@@ -82,13 +71,7 @@ describe("GET /self/avatar", () => {
         });
 
         it("should return 404 if user does not exist", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
             const accessToken = await createAccessToken(savedUser);
 
             const userRepository = new UserRepository();

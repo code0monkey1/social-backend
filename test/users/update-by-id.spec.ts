@@ -1,16 +1,17 @@
-import { UserType } from "./../../src/models/user.model";
-import jwt from "jsonwebtoken";
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-import { makeUserService } from "../../src/factories/services/user-service-factory";
 const api = supertest(app);
+import {
+    clearDb,
+    createAccessToken,
+    createUser,
+    deleteUser,
+    getUserById,
+    userData,
+} from "../testHelpers";
+
 const BASE_URL = "/users/";
-import User from "../../src/models/user.model";
-import { Config } from "../../src/config";
-import RefreshToken from "../../src/models/refresh.token.model";
-const userService = makeUserService();
-let user: any;
 
 describe("UPDATE /users/:userId", () => {
     beforeAll(async () => {
@@ -21,15 +22,9 @@ describe("UPDATE /users/:userId", () => {
         await db.disconnect();
     });
 
-    beforeEach(async () => {
-        // delete all users created
-        user = await createUser();
-    });
-
     afterEach(async () => {
         // delete all users created
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
+        await clearDb();
     });
 
     describe("sad path", () => {
@@ -45,13 +40,17 @@ describe("UPDATE /users/:userId", () => {
 
         it("should return 401 if user with userId in accessToken is not same as the param userId ", async () => {
             // arrange
-            const userId = "663f0f5379ab100cdd57882e";
-            const accessToken = await getAccessToken(userId);
+
+            const savedUser = await createUser(userData);
+
+            const accessToken = await createAccessToken(savedUser);
+
+            const differentUserId = "6641c748e2b52be16daf57fd";
             //act
 
             //assert
             await api
-                .patch(`${BASE_URL}/6641c748e2b52be16daf57fd`)
+                .patch(`${BASE_URL}/${differentUserId}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({
                     username: "test",
@@ -60,10 +59,14 @@ describe("UPDATE /users/:userId", () => {
         });
 
         it("should return 404 if the user is not found", async () => {
-            const userId = "663e3f9ba78db81d5d3e00c8";
-            const accessToken = await getAccessToken(userId);
+            const savedUser = await createUser(userData);
+            const userId = savedUser._id.toString();
+            const accessToken = await createAccessToken(savedUser);
+
+            await deleteUser(userId);
+
             await api
-                .patch(`${BASE_URL}/663e3f9ba78db81d5d3e00c8`)
+                .patch(`${BASE_URL}/${userId}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({
                     username: "test",
@@ -72,8 +75,9 @@ describe("UPDATE /users/:userId", () => {
         });
 
         it("should return 400 if the userId is of invalid format", async () => {
-            const userId = "123";
-            const accessToken = await getAccessToken(userId);
+            const savedUser = await createUser(userData);
+            const accessToken = await createAccessToken(savedUser);
+
             await api
                 .patch(`${BASE_URL}/123`)
                 .set("Cookie", [`accessToken=${accessToken}`])
@@ -84,8 +88,9 @@ describe("UPDATE /users/:userId", () => {
         });
         // DONE: correct this test
         it("should not permit uploading non-image files for profile pic ", async () => {
+            const user = await createUser(userData);
             const userId = user?._id.toString();
-            const accessToken = await getAccessToken(userId);
+            const accessToken = await createAccessToken(user);
 
             await api
                 .patch(`${BASE_URL}/${user?._id.toString()}`)
@@ -93,12 +98,7 @@ describe("UPDATE /users/:userId", () => {
                 .attach("file", `${__dirname}/test-data/fake-text-pic.png`)
                 .expect(400);
 
-            const { avatar } = (await User.findById(userId)) as {
-                avatar: {
-                    data: Buffer;
-                    contentType: string;
-                };
-            };
+            const { avatar } = await getUserById(userId);
 
             expect(avatar).toEqual({});
         }, 100000);
@@ -117,8 +117,9 @@ describe("UPDATE /users/:userId", () => {
         });
 
         it("should update username ", async () => {
-            const userId = user?._id.toString();
-            const accessToken = await getAccessToken(userId);
+            const user = await createUser(userData);
+            const userId = user._id.toString();
+            const accessToken = await createAccessToken(user);
 
             const result = await api
                 .patch(`${BASE_URL}/${userId}`)
@@ -133,8 +134,9 @@ describe("UPDATE /users/:userId", () => {
         });
         // DONE : should update user with profile pic
         it("should update user with profile pic", async () => {
-            const userId = user?._id.toString();
-            const accessToken = await getAccessToken(userId);
+            const user = await createUser(userData);
+            const userId = user._id.toString();
+            const accessToken = await createAccessToken(user);
 
             const response = await api
                 .patch(`${BASE_URL}/${userId}`)
@@ -142,16 +144,20 @@ describe("UPDATE /users/:userId", () => {
                 .attach("file", `${__dirname}/test-data/test-pic.png`)
                 .expect(200);
 
-            const savedUser = await User.findById(userId);
+            const savedUser = await getUserById(userId);
 
             expect(savedUser?.avatar?.data).toBeInstanceOf(Buffer); // Verify that the file was uploaded
             expect(savedUser?.avatar?.contentType).toBe("image/png");
         }, 1000000);
 
         it("should update description , if present", async () => {
-            const userId = user?._id.toString();
-            const accessToken = await getAccessToken(userId);
+            const user = await createUser(userData);
+            const userId = user._id.toString();
+
+            const accessToken = await createAccessToken(user);
+
             const about = "updated_description";
+
             const result = await api
                 .patch(`${BASE_URL}/${userId}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
@@ -165,25 +171,3 @@ describe("UPDATE /users/:userId", () => {
         });
     });
 });
-
-export const createUser = async () => {
-    const usr = {
-        name: "test",
-        email: "test@gmail.com",
-        password: "testing_right",
-    };
-
-    return await userService.createUser(usr.name, usr.email, usr.password);
-};
-
-const getAccessToken = async (userId: string) => {
-    const accessToken = await jwt.sign(
-        {
-            userId,
-        },
-        Config.JWT_SECRET!,
-        { expiresIn: "1h" },
-    );
-
-    return accessToken;
-};

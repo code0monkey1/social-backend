@@ -1,19 +1,19 @@
+import {
+    clearDb,
+    createAccessToken,
+    createUser,
+    deleteUser,
+    userData,
+} from "../testHelpers";
+
 import supertest from "supertest";
-import app from "../../src/app";
 import { db } from "../../src/utils/db";
+import app from "../../src/app";
 const api = supertest(app);
-import User from "../../src/models/user.model";
-import RefreshToken from "../../src/models/refresh.token.model";
-import { createAccessToken, createUser } from "../auth/helper";
-import { Config } from "../../src/config";
+
 const BASE_URL = "/users";
-import jwt from "jsonwebtoken";
-import { UserRepository } from "../../src/repositories/UserRepository";
-let userRepository: UserRepository;
 describe("GET /users/:userId", () => {
     beforeAll(async () => {
-        userRepository = new UserRepository();
-
         await db.connect();
     });
 
@@ -22,9 +22,7 @@ describe("GET /users/:userId", () => {
     });
 
     afterEach(async () => {
-        // delete all users created
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
+        await clearDb();
     });
 
     describe("unhappy path", () => {
@@ -34,16 +32,10 @@ describe("GET /users/:userId", () => {
         });
 
         it("should return 401 if user with userId in accessToken is not same as the param userId", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "test",
-            };
-
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
             const anotherUser = await createUser({
-                ...user,
+                ...userData,
                 name: "test2",
                 email: "test2@gmail",
             });
@@ -57,13 +49,7 @@ describe("GET /users/:userId", () => {
         });
 
         it("should return 400 if userId is of invalid type", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "test",
-            };
-
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
             const accessToken = await createAccessToken(savedUser);
 
@@ -74,13 +60,7 @@ describe("GET /users/:userId", () => {
         });
 
         it("should return 401 if accessToken is invalid", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "test",
-            };
-
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
             await api
                 .get(`${BASE_URL}/${savedUser._id.toString()}`)
@@ -89,23 +69,9 @@ describe("GET /users/:userId", () => {
         });
 
         it("should return 401 if accessToken is expired", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "test",
-            };
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
-            const accessToken = await jwt.sign(
-                {
-                    userId: savedUser._id.toString(),
-                },
-                Config.JWT_SECRET!,
-                {
-                    expiresIn: "0.1s",
-                },
-            );
-
+            const accessToken = createAccessToken(savedUser, 100);
             await api
                 .get(`${BASE_URL}/${savedUser._id.toString()}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
@@ -114,17 +80,11 @@ describe("GET /users/:userId", () => {
         });
 
         it("should return 404 when user does not exist", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-
-            const createdUser = await createUser(user);
+            const createdUser = await createUser(userData);
 
             const accessToken = await createAccessToken(createdUser);
 
-            await userRepository.deleteById(createdUser._id.toString());
+            await deleteUser(createdUser._id.toString());
 
             await api
                 .get(`${BASE_URL}/${createdUser._id.toString()}`)
@@ -142,12 +102,7 @@ describe("GET /users/:userId", () => {
         });
 
         it("should return status 200 and get the user by userId in the request", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-            const createdUser = await createUser(user);
+            const createdUser = await createUser(userData);
 
             const accessToken = await createAccessToken(createdUser);
 
@@ -156,8 +111,8 @@ describe("GET /users/:userId", () => {
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(200);
 
-            expect(response.body.name).toBe(user.name);
-            expect(response.body.email).toBe(user.email);
+            expect(response.body.name).toBe(userData.name);
+            expect(response.body.email).toBe(userData.email);
         });
     });
 });

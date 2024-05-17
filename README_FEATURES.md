@@ -1,7 +1,8 @@
 🧑‍💻 Checklist for social features to be implemented
 
 -   [x] User profile with a description and a photo
-    -   [ ] Retrieve stored user photo from db
+    -   [x] Retrieve stored user photo from db
+    -   [x] If avatar not present, get default photo and contentType
 -   [ ] Users following each other
 -   [ ] Who to follow suggestions
 -   [ ] Posting messages with photos

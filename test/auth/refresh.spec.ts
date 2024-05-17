@@ -1,29 +1,29 @@
-import { UserRepository } from "./../../src/repositories/UserRepository";
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-import RefreshToken from "../../src/models/refresh.token.model";
-import User from "../../src/models/user.model";
 import {
+    clearDb,
     createRefreshToken,
     createUser,
+    deleteRefreshTokens,
+    deleteUser,
+    getSavedRefreshToken,
     persistRefreshToken,
     shouldBeDifferentRefreshTokens,
     shouldHaveValidTokensInCookies,
-} from "./helper";
-import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepository";
+    userData,
+} from "../testHelpers";
 
 const api = supertest(app);
 const BASE_URL = "/auth/refresh";
 
 describe("POST /auth/refresh", () => {
-    afterEach(async () => {
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
-    });
-
     beforeAll(async () => {
         await db.connect();
+    });
+
+    afterEach(async () => {
+        await clearDb();
     });
 
     afterAll(async () => {
@@ -35,13 +35,7 @@ describe("POST /auth/refresh", () => {
             await api.post(BASE_URL).expect("Content-Type", /json/);
         });
         it("should return a new accessToken and refreshToken", async () => {
-            //create a user
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "testfhsr",
-            };
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
             //create a refresh token
             const prevRefreshToken = await createRefreshToken(
@@ -61,12 +55,7 @@ describe("POST /auth/refresh", () => {
         });
 
         it("should delete the previous refreshToken", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "testfhsr",
-            };
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
             //create a refresh token
             const persistedRefreshToken = await persistRefreshToken(
@@ -83,13 +72,11 @@ describe("POST /auth/refresh", () => {
                 .post(BASE_URL)
                 .set("Cookie", [`refreshToken=${refreshToken}`])
                 .expect(200);
-            const refreshTokenRepository = new RefreshTokenRepository();
 
-            const savedRefreshToken =
-                await refreshTokenRepository.findByRefreshIdAndUserId(
-                    persistedRefreshToken._id.toString(),
-                    savedUser._id.toString(),
-                );
+            const savedRefreshToken = await getSavedRefreshToken(
+                persistedRefreshToken._id.toString(),
+                savedUser._id.toString(),
+            );
 
             expect(savedRefreshToken).toBeNull();
         });
@@ -103,18 +90,13 @@ describe("POST /auth/refresh", () => {
         });
 
         it("should return 401 status if refreshToken is not in db", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "testfhsr",
-            };
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
             const refreshToken = await createRefreshToken(
                 savedUser._id.toString(),
             );
 
             //delete refresh token from db
-            await RefreshToken.deleteMany();
+            await deleteRefreshTokens();
 
             //attach deleted refresh token in cookie
 
@@ -125,20 +107,14 @@ describe("POST /auth/refresh", () => {
         });
 
         it("should return 404 status if user with given refreshToken does not exist", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail",
-                password: "testfhsr",
-            };
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
 
             const refreshToken = await createRefreshToken(
                 savedUser._id.toString(),
             );
 
             // delete user from db
-            const userRepository = new UserRepository();
-            await userRepository.deleteById(savedUser._id.toString());
+            await deleteUser(savedUser._id.toString());
 
             await api
                 .post(BASE_URL)

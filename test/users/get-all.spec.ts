@@ -1,22 +1,13 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-import jwt from "jsonwebtoken";
-import User, { UserType } from "../../src/models/user.model";
-import { UserRepository } from "../../src/repositories/UserRepository";
-import { hash } from "bcrypt";
+import { accessToken, clearDb, createUser, userData } from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/users";
-let accessToken: string;
-let userRepository: UserRepository;
+
 describe("GET /users", () => {
     beforeAll(async () => {
         await db.connect();
-
-        accessToken =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjNmMGY1Mzc5YWIxMDBjZGQ1Nzg4MmUiLCJpYXQiOjE3MTU0MDg3MjN9.LvqCZLdhkKL9DqYFXZbJZlF9BWKMQ_MBIn7D3DM-Wt4";
-
-        userRepository = new UserRepository();
     });
 
     afterAll(async () => {
@@ -24,7 +15,7 @@ describe("GET /users", () => {
     });
 
     afterEach(async () => {
-        await User.deleteMany({});
+        await clearDb();
     });
 
     describe("happy path", () => {
@@ -33,17 +24,10 @@ describe("GET /users", () => {
         });
 
         it("should return a list of users", async () => {
-            // insert single user
-
             //arrange
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testing_right",
-            };
             //act
 
-            await createUser(user);
+            await createUser(userData);
 
             //assert
             const users = await api
@@ -53,7 +37,7 @@ describe("GET /users", () => {
 
             expect(users.body.length).toBe(1);
 
-            expect(users.body[0].name).toBe(user.name);
+            expect(users.body[0].name).toBe(userData.name);
         });
     });
 
@@ -63,10 +47,3 @@ describe("GET /users", () => {
         });
     });
 });
-
-async function createUser(user: any) {
-    return userRepository.create({
-        ...user,
-        hashedPassword: await hash(user.password, 10),
-    });
-}

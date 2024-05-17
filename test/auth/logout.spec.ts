@@ -7,7 +7,6 @@ import { UserRepository } from "../../src/repositories/UserRepository";
 import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepository";
 import jwt from "jsonwebtoken";
 import { Config } from "../../src/config";
-
 import User from "../../src/models/user.model";
 const api = supertest(app);
 const BASE_URL = "/auth/logout";

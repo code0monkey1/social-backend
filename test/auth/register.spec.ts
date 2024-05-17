@@ -1,11 +1,11 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import bcrypt from "bcrypt";
-import User from "../../src/models/user.model";
 import RefreshToken from "../../src/models/refresh.token.model";
 import { db } from "../../src/utils/db";
 import { isJwt } from "../../src/utils";
 import { UserRepository } from "../../src/repositories/UserRepository";
+import { clearDb } from "../testHelpers";
 
 const api = supertest(app);
 const BASE_URL = "/auth/register";
@@ -19,8 +19,7 @@ describe("POST /auth/register", () => {
 
     beforeEach(async () => {
         // delete all users created
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
+        await clearDb();
     });
     afterAll(async () => {
         // disconnect db

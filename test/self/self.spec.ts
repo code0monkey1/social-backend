@@ -1,12 +1,10 @@
 import supertest from "supertest";
 import app from "../../src/app";
-import jwt from "jsonwebtoken";
 import { UserRepository } from "../../src/repositories/UserRepository";
-import { Config } from "../../src/config";
-import { hash } from "bcrypt";
 import { db } from "../../src/utils/db";
 import User from "../../src/models/user.model";
 import RefreshToken from "../../src/models/refresh.token.model";
+import { createAccessToken, createUser } from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/auth/self";
 
@@ -81,22 +79,3 @@ describe("GET /auth/self", () => {
         });
     });
 });
-
-async function createUser(user: any) {
-    return userRepository.create({
-        ...user,
-        hashedPassword: await hash(user.password, 10),
-    });
-}
-
-async function createAccessToken(user: any) {
-    return await jwt.sign(
-        {
-            userId: user._id.toString(),
-        },
-        Config.JWT_SECRET!,
-        {
-            expiresIn: "1h",
-        },
-    );
-}
