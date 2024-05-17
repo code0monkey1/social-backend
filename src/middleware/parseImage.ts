@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { validateMIMEType } from "validate-image-type";
 import fs from "fs";
+import logger from "../config/logger";
+
 export const parseImage = async (
     req: Request,
     _res: Response,
@@ -26,7 +28,12 @@ export const parseImage = async (
 
         if (!result.ok) {
             //delete file:
-            fs.unlinkSync(_req.file.path);
+            fs.unlink(_req.file.path, (err) => {
+                if (err instanceof Error) {
+                    logger.error(err);
+                    throw createHttpError(500, "Error while deleting file");
+                }
+            });
 
             throw createHttpError(400, "Invalid file type");
         }

@@ -4,6 +4,8 @@ import { UserType } from "../../models/user.model";
 import { TokenService } from "../../services/TokenService";
 import fs from "fs";
 import { AuthRequest } from "../auth/AuthController";
+import logger from "../../config/logger";
+import createHttpError from "http-errors";
 export class UserController {
     constructor(
         private readonly userService: UserService,
@@ -76,7 +78,13 @@ export class UserController {
                 };
 
                 //delete file
-                fs.unlinkSync(req.file.path);
+                fs.unlink(req.file.path, (err) => {
+                    if (err) {
+                        logger.error(err);
+                        const error = createHttpError(400, `Invalid file type`);
+                        return next(error);
+                    }
+                });
             }
 
             const updatedUser = await this.userService.findByIdAndUpdate(

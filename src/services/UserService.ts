@@ -3,6 +3,7 @@ import { UserRepository } from "../repositories/UserRepository";
 import { EncryptionService } from "./EncryptionService";
 import { PhotoType, UserType } from "../models/user.model";
 import fs from "fs";
+import logger from "../config/logger";
 
 export class UserService {
     constructor(
@@ -30,8 +31,12 @@ export class UserService {
             contentType,
         } as unknown as PhotoType;
 
-        //delete file
-        fs.unlinkSync(filePath);
+        fs.unlink(filePath, (err) => {
+            if (err instanceof Error) {
+                logger.error(err);
+            }
+            throw createHttpError(400, "Invalid file type");
+        });
 
         const savedUser = await user.save();
 
