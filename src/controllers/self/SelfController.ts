@@ -1,13 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
-import { TokenService } from "../../services/TokenService";
 import { UserService } from "../../services/UserService";
+import getDefaultProfileImageAndType from "../../helpers";
 
-export class AuthController {
-    constructor(
-        private readonly tokenService: TokenService,
-        private readonly userService: UserService,
-    ) {}
+export class SelfController {
+    constructor(private readonly userService: UserService) {}
 
     self = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -23,6 +20,37 @@ export class AuthController {
             res.json(user);
         } catch (error) {
             next(error);
+        }
+    };
+    avatar = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const {
+                auth: { userId },
+            } = req as AuthRequest;
+
+            const { _id } = await this.userService.findUserById(userId);
+
+            const avatar = await this.userService.getUserAvatar(_id.toString());
+
+            if (!avatar?.data) {
+                return next();
+            }
+            res.set("Content-Type", avatar.contentType);
+            res.json(avatar.data);
+        } catch (e) {
+            next(e);
+        }
+    };
+    defaultAvatar = (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { defaultImageBuffer, defaultImageType } =
+                getDefaultProfileImageAndType();
+
+            res.set("Content-Type", defaultImageType);
+
+            res.send(defaultImageBuffer);
+        } catch (e) {
+            next(e);
         }
     };
 }

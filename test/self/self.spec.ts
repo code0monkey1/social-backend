@@ -9,9 +9,9 @@ import {
     userData,
 } from "../testHelpers";
 const api = supertest(app);
-const BASE_URL = "/auth/self";
+const BASE_URL = "/self";
 
-describe("GET /auth/self", () => {
+describe("GET /self", () => {
     beforeEach(async () => {
         // delete all users created
         await clearDb();

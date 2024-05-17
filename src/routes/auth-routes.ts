@@ -17,7 +17,7 @@ route.post("/login", loginValidator, authController.login);
 
 route.post("/logout", authenticate, parseRefreshToken, authController.logout);
 
-route.get("/self", authenticate, authController.self);
+// route.get("/self", authenticate, authController.self);
 
 route.post("/refresh", validateRefreshToken, authController.refresh);
 
