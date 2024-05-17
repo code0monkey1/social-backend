@@ -1,7 +1,7 @@
 import { UserRepository } from "../../src/repositories/UserRepository";
 const userRepository = new UserRepository();
 import jwt from "jsonwebtoken";
-import { hash } from "bcrypt";
+import { hash, compare } from "bcrypt";
 import { Config } from "../../src/config";
 import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepository";
 import RefreshToken from "../../src/models/refresh.token.model";
@@ -109,12 +109,10 @@ export async function createRefreshToken(
 }
 
 export async function persistRefreshToken(userId: string) {
-    const refreshTokenEntry = await refreshTokenRepository.createRefreshToken({
+    return await refreshTokenRepository.createRefreshToken({
         user: userId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
     });
-
-    return refreshTokenEntry;
 }
 
 export async function clearDb() {
@@ -150,7 +148,33 @@ export async function deleteRefreshTokens() {
 }
 
 export async function getUserById(userId: string): Promise<UserType> {
-    const user = (await User.findById(userId)) as UserType;
+    return (await User.findById(userId)) as UserType;
+}
 
-    return user;
+export async function getAllUsers() {
+    return await User.find({});
+}
+
+export async function getAllRefreshTokens() {
+    return await RefreshToken.find({});
+}
+
+export async function assertRefreshTokenWasDeleted(
+    tokensBefore: any,
+    tokensAfter: any,
+) {
+    expect(tokensBefore.length).toBe(1);
+    expect(tokensAfter.length).toBe(0);
+}
+
+export async function assertIsUserPassword(
+    plainPassword: string,
+    hashedPassword: string,
+) {
+    expect(hashedPassword).toBeDefined();
+    expect(await compare(plainPassword, hashedPassword)).toBeTruthy();
+}
+
+export async function updateUserAvatar(userId: string, avatar: any) {
+    await User.findByIdAndUpdate(userId, { avatar });
 }

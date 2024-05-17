@@ -1,23 +1,22 @@
 import supertest from "supertest";
 import app from "../../src/app";
-import { UserRepository } from "../../src/repositories/UserRepository";
 import { db } from "../../src/utils/db";
-import User from "../../src/models/user.model";
-import RefreshToken from "../../src/models/refresh.token.model";
-import { createAccessToken, createUser } from "../testHelpers";
+import {
+    clearDb,
+    createAccessToken,
+    createUser,
+    deleteUser,
+    userData,
+} from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/auth/self";
-
-let userRepository: UserRepository;
 
 describe("GET /auth/self", () => {
     beforeEach(async () => {
         // delete all users created
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
+        await clearDb();
     });
     beforeAll(async () => {
-        userRepository = new UserRepository();
         await db.connect();
     });
 
@@ -30,12 +29,7 @@ describe("GET /auth/self", () => {
             await api.get(BASE_URL).expect("Content-Type", /json/);
         });
         it("should get the user by auth userId in the request", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-            const savedUser = await createUser(user);
+            const savedUser = await createUser(userData);
             const accessToken = await createAccessToken(savedUser);
 
             const response = await api
@@ -43,7 +37,7 @@ describe("GET /auth/self", () => {
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(200);
 
-            expect(response.body.name).toBe(user.name);
+            expect(response.body.name).toBe(userData.name);
         });
     });
 
@@ -52,17 +46,11 @@ describe("GET /auth/self", () => {
             await api.get(BASE_URL).expect(401);
         });
         it("should return 404 when user does not exist", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-
-            const createdUser = await createUser(user);
+            const createdUser = await createUser(userData);
 
             const accessToken = await createAccessToken(createdUser);
 
-            await userRepository.deleteById(createdUser._id.toString());
+            await deleteUser(createdUser._id.toString());
 
             await api
                 .get(BASE_URL)

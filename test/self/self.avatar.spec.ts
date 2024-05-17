@@ -1,10 +1,15 @@
 import supertest from "supertest";
 import app from "../../src/app";
-import { UserRepository } from "../../src/repositories/UserRepository";
 import { db } from "../../src/utils/db";
-import User, { PhotoType } from "../../src/models/user.model";
 import getDefaultProfileImageAndType from "../../src/helpers";
-import { createAccessToken, createUser, userData } from "../testHelpers";
+import {
+    clearDb,
+    createAccessToken,
+    createUser,
+    deleteUser,
+    updateUserAvatar,
+    userData,
+} from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/self/avatar";
 
@@ -14,7 +19,7 @@ describe("GET /self/avatar", () => {
     });
 
     afterEach(async () => {
-        await User.deleteMany({});
+        await clearDb();
     });
 
     afterAll(async () => {
@@ -50,9 +55,9 @@ describe("GET /self/avatar", () => {
             const avatar = {
                 data: fileBuffer,
                 contentType: "image/png",
-            } as PhotoType;
+            };
 
-            await User.findByIdAndUpdate(savedUser._id, { avatar });
+            await updateUserAvatar(savedUser._id.toString(), avatar);
 
             // the content type should be image/png
             const response = await api
@@ -74,9 +79,7 @@ describe("GET /self/avatar", () => {
             const savedUser = await createUser(userData);
             const accessToken = await createAccessToken(savedUser);
 
-            const userRepository = new UserRepository();
-            await userRepository.deleteById(savedUser._id.toString());
-
+            await deleteUser(savedUser._id.toString());
             await api
                 .get(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])

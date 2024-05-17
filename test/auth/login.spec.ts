@@ -1,18 +1,19 @@
-import { createUser, userData } from "./../testHelpers/index";
+import {
+    createUser,
+    getAllUsers,
+    shouldHaveValidTokensInCookies,
+    userData,
+} from "./../testHelpers/index";
 import { db } from "../../src/utils/db";
 import supertest from "supertest";
 import app from "../../src/app";
 const api = supertest(app);
-import { UserRepository } from "../../src/repositories/UserRepository";
-import { isJwt } from "../../src/utils/index";
 import { clearDb } from "../testHelpers";
 const BASE_URL = "/auth/login";
-let userRepository: UserRepository;
 
 describe("POST /auth/login", () => {
     beforeAll(async () => {
         await db.connect();
-        userRepository = new UserRepository();
     });
 
     afterEach(async () => {
@@ -37,31 +38,7 @@ describe("POST /auth/login", () => {
                 .send(userData)
                 .expect(201);
 
-            interface Headers {
-                ["set-cookie"]: string[];
-            }
-
-            let accessToken = "";
-            let refreshToken = "";
-
-            // assert
-            expect(response.headers["set-cookie"]).toBeDefined();
-
-            const cookies =
-                (response.headers as unknown as Headers)["set-cookie"] || [];
-
-            cookies.forEach((c) => {
-                if (c.startsWith("accessToken="))
-                    accessToken = c.split(";")[0].split("=")[1];
-                if (c.startsWith("refreshToken="))
-                    refreshToken = c.split(";")[0].split("=")[1];
-            });
-
-            expect(accessToken).toBeTruthy();
-            expect(refreshToken).toBeTruthy();
-
-            expect(isJwt(accessToken)).toBeTruthy();
-            expect(isJwt(refreshToken)).toBeTruthy();
+            await shouldHaveValidTokensInCookies(response);
         });
     });
 
@@ -90,7 +67,7 @@ describe("POST /auth/login", () => {
                 .send({ ...userData, email: "other_email@gmail.com" })
                 .expect(400);
 
-            const users = await userRepository.findAll();
+            const users = await getAllUsers();
             expect(users).toHaveLength(1);
 
             expect(users[0].hashedPassword).toBeDefined();
@@ -104,7 +81,7 @@ describe("POST /auth/login", () => {
                 .send({ ...userData, password: "other_password" })
                 .expect(400);
 
-            const users = await userRepository.findAll();
+            const users = await getAllUsers();
             expect(users).toHaveLength(1);
 
             expect(users[0].hashedPassword).toBeDefined();
