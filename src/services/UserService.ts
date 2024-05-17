@@ -48,9 +48,9 @@ export class UserService {
             throw error;
         }
 
-        const { email, name, about, _id } = user;
+        const { email, name, about, _id, followers, following } = user;
 
-        return { email, name, about, _id };
+        return { email, name, about, _id, followers, following };
     }
 
     async createUser(name: string, email: string, password: string) {
@@ -150,5 +150,45 @@ export class UserService {
         };
 
         return avatar;
+    }
+
+    async follow(userId: string, followId: string) {
+        const user = await this.userRepository.findById(userId);
+        const userToFollow = await this.userRepository.findById(followId);
+
+        if (!user) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
+
+        if (!user.following) {
+            user.following = [];
+        }
+
+        if (!user.following?.includes(followId)) {
+            user.following?.push(followId);
+        }
+
+        if (!userToFollow) {
+            const error = createHttpError(
+                404,
+                `User with ${userId} does not exist`,
+            );
+            throw error;
+        }
+
+        if (!userToFollow.followers) {
+            userToFollow.followers = [];
+        }
+
+        if (!userToFollow.followers?.includes(userId)) {
+            userToFollow.followers?.push(userId);
+        }
+
+        await user.save();
+        await userToFollow.save();
     }
 }

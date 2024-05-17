@@ -12,6 +12,8 @@ const userController = makeUserController();
 
 const upload = multer({ dest: "uploads/" });
 
+// const userService = makeUserService();
+
 route.get("/:userId", authenticate, hasAuthorization, userController.findById);
 
 route.patch(
@@ -31,5 +33,7 @@ route.delete(
     hasAuthorization,
     userController.deleteById,
 );
+
+route.put("/:userId/follow", authenticate, userController.follow);
 
 export default route;

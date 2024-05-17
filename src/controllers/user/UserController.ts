@@ -3,11 +3,28 @@ import { UserService } from "../../services/UserService";
 import { UserType } from "../../models/user.model";
 import { TokenService } from "../../services/TokenService";
 import fs from "fs";
+import { AuthRequest } from "../auth/AuthController";
 export class UserController {
     constructor(
         private readonly userService: UserService,
         private readonly tokenService: TokenService,
     ) {}
+
+    follow = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as AuthRequest;
+
+            const { userId } = _req.auth;
+
+            const { userId: followId } = req.params;
+
+            await this.userService.follow(userId, followId);
+
+            res.json();
+        } catch (e) {
+            next(e);
+        }
+    };
 
     findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {

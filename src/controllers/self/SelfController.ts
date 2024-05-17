@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { UserService } from "../../services/UserService";
 import getDefaultProfileImageAndType from "../../helpers";
+import { AuthRequest } from "../auth/AuthController";
 
 export class SelfController {
     constructor(private readonly userService: UserService) {}
@@ -52,13 +53,6 @@ export class SelfController {
         } catch (e) {
             next(e);
         }
-    };
-}
-
-export interface AuthRequest extends Request {
-    auth: {
-        userId: string;
-        refreshTokenId: string;
     };
 }
 

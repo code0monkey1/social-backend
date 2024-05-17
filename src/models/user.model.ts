@@ -12,6 +12,8 @@ export interface UserType {
     hashedPassword: string;
     about?: string;
     avatar?: PhotoType;
+    followers?: string[];
+    following?: string[];
 }
 // the file is 1 directory up in pics with the name profile-default.svg
 
@@ -41,6 +43,8 @@ const UserSchema = new Schema<UserType>(
             data: Buffer,
             contentType: String,
         },
+        followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+        following: [{ type: Schema.Types.ObjectId, ref: "User" }],
     },
     {
         timestamps: true,
