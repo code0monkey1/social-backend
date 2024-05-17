@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
-import { UserService } from "../../services/UserService";
-import getDefaultProfileImageAndType from "../../helpers";
-import { AuthRequest } from "../auth/AuthController";
+import { UserService } from "../services/UserService";
+import getDefaultProfileImageAndType from "../helpers";
+import { AuthRequest } from "./AuthController";
 
 export class SelfController {
     constructor(private readonly userService: UserService) {}

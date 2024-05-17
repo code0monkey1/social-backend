@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
-import { makeUserService } from "../factories/services/user-service-factory";
-import { SelfController } from "../controllers/self/SelfController";
+import { makeSelfController } from "../factories/controllers/self-controller-factory";
 
 const route = Router();
-const userService = makeUserService();
 
-const selfController = new SelfController(userService);
+const selfController = makeSelfController();
 
 route.get("/", authenticate, selfController.self);
 

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import { makeUserController } from "./../factories/controllers/user-controller-factory";
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import { hasAuthorization } from "../middleware/hasAuthorization";
 import multer from "multer";
-import { makeUserController } from "../factories/controllers/user/user-controller-factory";
 import { parseImage } from "../middleware/parseImage";
 
 const route = Router();
@@ -11,8 +11,6 @@ const route = Router();
 const userController = makeUserController();
 
 const upload = multer({ dest: "uploads/" });
-
-// const userService = makeUserService();
 
 route.get("/:userId", authenticate, hasAuthorization, userController.findById);
 

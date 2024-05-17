@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { isValidObjectId } from "mongoose";
-import { AuthRequest } from "../controllers/auth/AuthController";
+import { AuthRequest } from "../controllers/AuthController";
 
 export const hasAuthorization = (
     req: Request,

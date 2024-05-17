@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { UserService } from "../../services/UserService";
-import { UserType } from "../../models/user.model";
-import { TokenService } from "../../services/TokenService";
+import { UserService } from "../services/UserService";
+import { UserType } from "../models/user.model";
+import { TokenService } from "../services/TokenService";
 import fs from "fs";
-import { AuthRequest } from "../auth/AuthController";
-import logger from "../../config/logger";
+import { AuthRequest } from "./AuthController";
+import logger from "../config/logger";
 import createHttpError from "http-errors";
 export class UserController {
     constructor(

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../../models/user.model";
+import User from "../models/user.model";
 import createHttpError from "http-errors";
-import { TokenService } from "../../services/TokenService";
-import { UserService } from "../../services/UserService";
+import { TokenService } from "../services/TokenService";
+import { UserService } from "../services/UserService";
 import { validationResult } from "express-validator";
 export class AuthController {
     constructor(
