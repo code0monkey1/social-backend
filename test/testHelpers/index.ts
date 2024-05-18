@@ -86,6 +86,8 @@ export async function shouldHaveValidTokensInCookies(response: any) {
     expect(isJwt(refreshToken)).toBeTruthy();
 }
 
+export const deletedUserId = "6647ba93ab53630b4aa7ee38";
+
 export async function createRefreshToken(
     userId: string,
     refreshTokenId?: string,
@@ -177,4 +179,28 @@ export async function assertIsUserPassword(
 
 export async function updateUserAvatar(userId: string, avatar: any) {
     await User.findByIdAndUpdate(userId, { avatar });
+}
+
+export async function removeFollowing(userId: string, followingId: string) {
+    const user = await User.findById(userId);
+
+    const newFollowing = user?.following?.filter((f) => f !== followingId);
+
+    user!.following = newFollowing;
+
+    await user?.save();
+}
+
+export async function addFollowing(user: any, followedUser: any) {
+    user.following = user.following?.concat(followedUser._id.toString());
+
+    await user!.save();
+}
+
+export async function addFollower(user: any, followedUser: any) {
+    followedUser.followers = followedUser?.followers?.concat(
+        user._id.toString(),
+    );
+
+    await followedUser.save();
 }

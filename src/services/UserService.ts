@@ -42,21 +42,6 @@ export class UserService {
 
         return savedUser;
     }
-    async findUserById(userId: string) {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
-
-        const { email, name, about, _id, followers, following } = user;
-
-        return { email, name, about, _id, followers, following };
-    }
 
     async createUser(name: string, email: string, password: string) {
         const hashedPassword = await this.encryptionService.hash(password);
@@ -95,6 +80,11 @@ export class UserService {
 
     async findById(userId: string) {
         const user = await this.userRepository.findById(userId);
+
+        await user?.populate("followers", "_id name");
+
+        await user?.populate("following", "_id name");
+
         if (!user) {
             const error = createHttpError(
                 404,
@@ -109,7 +99,10 @@ export class UserService {
         userId: string,
         payload: Omit<Partial<UserType>, "password">,
     ) {
-        const user = await this.userRepository.update(userId, payload);
+        const user = await this.userRepository.findByIdAndUpdate(
+            userId,
+            payload,
+        );
 
         if (!user) {
             const error = createHttpError(
@@ -198,5 +191,33 @@ export class UserService {
             userToFollow.followers?.push(userId);
         }
         await userToFollow.save();
+    };
+
+    removeFollowing = async (userId: string, followId: string) => {
+        const user = await this.userRepository.findById(userId);
+
+        if (!user) {
+            throw createHttpError(404, `User with id ${userId} not found`);
+        }
+
+        const modifiedFollowers = user.following?.filter((f) => f != followId);
+
+        user.following = modifiedFollowers;
+
+        await user.save();
+    };
+
+    removeFollower = async (userId: string, followId: string) => {
+        const followingUser = await this.userRepository.findById(followId);
+
+        if (!followingUser) {
+            throw createHttpError(404, `User with id ${followId} not found`);
+        }
+
+        followingUser.followers = followingUser.followers?.filter(
+            (f) => f != userId,
+        );
+
+        await followingUser.save();
     };
 }

@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon src/server.ts",
-        "test": "node --no-warnings --experimental-vm-modules node_modules/.bin/jest --watchAll --runInBand --coverage",
+        "test": "node --no-warnings --experimental-vm-modules node_modules/.bin/jest --watchAll --runInBand ",
         "format:check": "prettier . --check",
         "format:fix": "prettier . --write",
         "test:prod": "jest --runInBand",

@@ -39,4 +39,11 @@ route.patch(
     userController.addFollower,
 );
 
+route.patch(
+    "/:userId/unfollow",
+    authenticate,
+    userController.removeFollowing,
+    userController.removeFollower,
+);
+
 export default route;

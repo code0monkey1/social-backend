@@ -12,7 +12,7 @@ export class SelfController {
             // get userId from cookie
             const { userId } = (req as AuthRequest).auth;
 
-            const user = await this.userService.findUserById(userId);
+            const user = await this.userService.findById(userId);
 
             if (!user) {
                 throw createHttpError(404, "User not found");
@@ -29,7 +29,7 @@ export class SelfController {
                 auth: { userId },
             } = req as AuthRequest;
 
-            const { _id } = await this.userService.findUserById(userId);
+            const { _id } = await this.userService.findById(userId);
 
             const avatar = await this.userService.getUserAvatar(_id.toString());
 

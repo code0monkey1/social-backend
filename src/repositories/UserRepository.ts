@@ -4,7 +4,7 @@ export class UserRepository {
     public async create(user: Partial<UserType>) {
         return await User.create(user);
     }
-    public async update(userId: string, payload: Partial<UserType>) {
+    public async findByIdAndUpdate(userId: string, payload: Partial<UserType>) {
         return await User.findByIdAndUpdate(userId, payload, { new: true });
     }
     public async findByEmail(email: string) {
@@ -14,9 +14,7 @@ export class UserRepository {
         return await User.findByIdAndDelete(userId);
     }
     public async findById(userId: string) {
-        return await User.findById(userId)
-            .populate("following", "_id name")
-            .populate("followers", "_id name");
+        return await User.findById(userId);
     }
     public async findAll() {
         return await User.find();

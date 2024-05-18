@@ -15,7 +15,7 @@ export class AuthController {
             // get userId from cookie
             const { userId } = (req as AuthRequest).auth;
 
-            const user = await this.userService.findUserById(userId);
+            const user = await this.userService.findById(userId);
 
             if (!user) {
                 throw createHttpError(404, "User not found");
@@ -106,7 +106,7 @@ export class AuthController {
                 user?._id.toString(),
             );
 
-            res.status(201).json();
+            res.status(200).json();
         } catch (e) {
             next(e);
         }
@@ -144,7 +144,7 @@ export class AuthController {
             );
 
             // create new refreshToken
-            const user = await this.userService.findUserById(userId);
+            const user = await this.userService.findById(userId);
 
             if (!user) {
                 const error = createHttpError(404, "User not found");

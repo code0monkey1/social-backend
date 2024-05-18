@@ -36,7 +36,7 @@ describe("POST /auth/login", () => {
             const response = await api
                 .post(BASE_URL)
                 .send(userData)
-                .expect(201);
+                .expect(200);
 
             await shouldHaveValidTokensInCookies(response);
         });

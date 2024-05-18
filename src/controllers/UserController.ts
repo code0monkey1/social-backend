@@ -113,4 +113,43 @@ export class UserController {
             next(e);
         }
     };
+
+    removeFollowing = async (
+        req: Request,
+        _res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            const _req = req as AuthRequest;
+
+            const { userId } = _req.auth;
+
+            const followingId = req.params.userId;
+
+            await this.userService.removeFollowing(userId, followingId);
+
+            next();
+        } catch (e) {
+            next(e);
+        }
+    };
+    removeFollower = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            const _req = req as AuthRequest;
+
+            const { userId } = _req.auth;
+
+            const followingId = req.params.userId;
+
+            await this.userService.removeFollower(userId, followingId);
+
+            res.json();
+        } catch (e) {
+            next(e);
+        }
+    };
 }
