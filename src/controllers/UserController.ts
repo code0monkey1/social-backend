@@ -152,4 +152,20 @@ export class UserController {
             next(e);
         }
     };
+
+    discover = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as AuthRequest;
+
+            const { userId } = _req.auth;
+
+            const usersToFollow =
+                await this.userService.getRecommendations(userId);
+
+            res.json(usersToFollow);
+            res.json();
+        } catch (e) {
+            next(e);
+        }
+    };
 }

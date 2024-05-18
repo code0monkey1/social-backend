@@ -60,6 +60,7 @@ describe("/users/:userId/unfollow", () => {
                 email: "followed_user@gmail.com",
             });
 
+            // add the userId to the followedUser's followers list
             await addFollower(user, followedUser);
 
             const accessToken = await createAccessToken(user);

@@ -19,4 +19,7 @@ export class UserRepository {
     public async findAll() {
         return await User.find();
     }
+    public async getUserRecommendations(following: string[]) {
+        return await User.find({ _id: { $nin: following } }).select("name _id");
+    }
 }

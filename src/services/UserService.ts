@@ -220,4 +220,23 @@ export class UserService {
 
         await followingUser.save();
     };
+
+    getRecommendations = async (userId: string) => {
+        const user = await this.userRepository.findById(userId);
+
+        if (!user) {
+            throw createHttpError(404, `User with id ${userId} not found`);
+        }
+
+        if (!user.following) {
+            user.following = [];
+        }
+
+        const followingUsers = user.following?.concat(userId);
+
+        const recommendedUsers =
+            await this.userRepository.getUserRecommendations(followingUsers);
+
+        return recommendedUsers;
+    };
 }

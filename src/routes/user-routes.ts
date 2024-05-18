@@ -46,4 +46,6 @@ route.patch(
     userController.removeFollower,
 );
 
+route.get("/:userId/recommendations", authenticate, userController.discover);
+
 export default route;
