@@ -2,7 +2,7 @@
 
 -   [x] User profile with a description and a photo
 -   [x] Users following each other
--   [ ] Who to follow suggestions
+-   [x] Who to follow suggestions
 -   [ ] Posting messages with photos
 -   [ ] NewsFeed with posts from followed users
 -   [ ] Listing posts by user

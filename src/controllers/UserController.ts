@@ -153,7 +153,11 @@ export class UserController {
         }
     };
 
-    discover = async (req: Request, res: Response, next: NextFunction) => {
+    recommendations = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
         try {
             const _req = req as AuthRequest;
 
