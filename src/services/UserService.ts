@@ -160,16 +160,7 @@ export class UserService {
             );
             throw error;
         }
-
-        if (!user.following) {
-            user.following = [];
-        }
-
-        if (!user.following?.includes(followId)) {
-            user.following?.push(followId);
-        }
-
-        await user.save();
+        await this.userRepository.addFollowing(userId, followId);
     }
 
     addFollower = async (userId: string, followId: string) => {
@@ -183,14 +174,7 @@ export class UserService {
             throw error;
         }
 
-        if (!userToFollow.followers) {
-            userToFollow.followers = [];
-        }
-
-        if (!userToFollow.followers?.includes(userId)) {
-            userToFollow.followers?.push(userId);
-        }
-        await userToFollow.save();
+        await this.userRepository.addFollower(followId, userId);
     };
 
     removeFollowing = async (userId: string, followId: string) => {
@@ -200,11 +184,7 @@ export class UserService {
             throw createHttpError(404, `User with id ${userId} not found`);
         }
 
-        const modifiedFollowers = user.following?.filter((f) => f != followId);
-
-        user.following = modifiedFollowers;
-
-        await user.save();
+        await this.userRepository.removeFollowing(userId, followId);
     };
 
     removeFollower = async (userId: string, followId: string) => {
