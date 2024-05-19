@@ -1,5 +1,4 @@
 import {
-    clearDb,
     createAccessToken,
     createUser,
     deleteUser,
@@ -22,7 +21,7 @@ describe("GET /users/:userId", () => {
     });
 
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
 
     describe("unhappy path", () => {

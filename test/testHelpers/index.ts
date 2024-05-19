@@ -117,11 +117,6 @@ export async function persistRefreshToken(userId: string) {
     });
 }
 
-export async function clearDb() {
-    await User.deleteMany({});
-    await RefreshToken.deleteMany({});
-}
-
 export async function deleteUser(userId: string) {
     return await User.findByIdAndDelete(userId);
 }

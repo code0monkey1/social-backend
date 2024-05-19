@@ -7,8 +7,6 @@ const BASE_URL = "/users";
 const userId = "663f0f5379ab100cdd57882e";
 let userRepository: UserRepository;
 let refreshTokenRepository: RefreshTokenRepository;
-import User from "../../src/models/user.model";
-import RefreshToken from "../../src/models/refresh.token.model";
 import { db } from "../../src/utils/db";
 import { Config } from "../../src/config";
 import jwt from "jsonwebtoken";
@@ -26,8 +24,7 @@ describe("DELETE /:userId", () => {
     });
 
     afterEach(async () => {
-        await User.deleteMany({});
-        await RefreshToken.deleteMany({});
+        await db.clear();
     });
 
     describe("happy path", () => {

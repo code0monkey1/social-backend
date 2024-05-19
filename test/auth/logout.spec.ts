@@ -4,7 +4,6 @@ import { db } from "../../src/utils/db";
 
 import {
     assertRefreshTokenWasDeleted,
-    clearDb,
     createAccessToken,
     createRefreshToken,
     createUser,
@@ -22,7 +21,7 @@ describe("POST /auth/logout", () => {
 
     afterEach(async () => {
         // delete all users created
-        await clearDb();
+        await db.clear();
     });
 
     afterAll(async () => {

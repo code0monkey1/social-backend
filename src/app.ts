@@ -5,6 +5,7 @@ const app = express();
 import authRouter from "./routes/auth-routes";
 import userRouter from "./routes/user-routes";
 import selfRouter from "./routes/self-routes";
+import postRouter from "./routes/post-routes";
 import cookieParse from "cookie-parser";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -22,6 +23,8 @@ app.use("/auth", authRouter);
 app.use("/users", userRouter);
 
 app.use("/self", selfRouter);
+
+app.use("/users", postRouter);
 
 app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

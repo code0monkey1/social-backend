@@ -36,4 +36,13 @@ export const db = {
                 logger.error(`error connecting from MongoDB: ${error.message}`);
         }
     },
+
+    clear: async () => {
+        try {
+            await mongoose.connection.dropDatabase();
+        } catch (error) {
+            if (error instanceof Error)
+                logger.error(`error connecting from MongoDB: ${error.message}`);
+        }
+    },
 };

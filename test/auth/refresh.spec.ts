@@ -2,7 +2,6 @@ import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
 import {
-    clearDb,
     createRefreshToken,
     createUser,
     deleteRefreshTokens,
@@ -23,7 +22,7 @@ describe("POST /auth/refresh", () => {
     });
 
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
 
     afterAll(async () => {

@@ -1,16 +1,15 @@
-import { db } from "./../../src/utils/db";
+import { db } from "../../../src/utils/db";
 import {
     addFollower,
     addFollowing,
-    clearDb,
     createAccessToken,
     createUser,
     deletedUserId,
     getUserById,
     userData,
-} from "./../testHelpers/index";
+} from "../../testHelpers/index";
 import supertest from "supertest";
-import app from "../../src/app";
+import app from "../../../src/app";
 
 const api = supertest(app);
 
@@ -19,7 +18,7 @@ describe("/users/:userId/unfollow", () => {
         await db.connect();
     });
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
     afterAll(async () => {
         await db.disconnect();

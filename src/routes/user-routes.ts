@@ -32,6 +32,8 @@ route.delete(
     userController.deleteById,
 );
 
+// follow routes
+
 route.patch(
     "/:userId/follow",
     authenticate,
@@ -45,6 +47,8 @@ route.patch(
     userController.removeFollowing,
     userController.removeFollower,
 );
+
+// user follow recommendations
 
 route.get(
     "/:userId/recommendations",

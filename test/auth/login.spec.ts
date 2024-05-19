@@ -8,7 +8,6 @@ import { db } from "../../src/utils/db";
 import supertest from "supertest";
 import app from "../../src/app";
 const api = supertest(app);
-import { clearDb } from "../testHelpers";
 const BASE_URL = "/auth/login";
 
 describe("POST /auth/login", () => {
@@ -18,7 +17,7 @@ describe("POST /auth/login", () => {
 
     afterEach(async () => {
         // delete all users created
-        await clearDb();
+        await db.clear();
     });
 
     afterAll(async () => {

@@ -3,7 +3,6 @@ import app from "../../src/app";
 import { db } from "../../src/utils/db";
 const api = supertest(app);
 import {
-    clearDb,
     createAccessToken,
     createUser,
     deleteUser,
@@ -24,7 +23,7 @@ describe("UPDATE /users/:userId", () => {
 
     afterEach(async () => {
         // delete all users created
-        await clearDb();
+        await db.clear();
     });
 
     describe("sad path", () => {

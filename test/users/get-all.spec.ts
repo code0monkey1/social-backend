@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-import { accessToken, clearDb, createUser, userData } from "../testHelpers";
+import { accessToken, createUser, userData } from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/users";
 
@@ -15,7 +15,7 @@ describe("GET /users", () => {
     });
 
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
 
     describe("happy path", () => {

@@ -2,7 +2,6 @@ import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
 import {
-    clearDb,
     createAccessToken,
     createUser,
     deleteUser,
@@ -13,8 +12,7 @@ const BASE_URL = "/self";
 
 describe("GET /self", () => {
     beforeEach(async () => {
-        // delete all users created
-        await clearDb();
+        await db.clear();
     });
     beforeAll(async () => {
         await db.connect();

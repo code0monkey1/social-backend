@@ -3,7 +3,6 @@ import app from "../../src/app";
 import { db } from "../../src/utils/db";
 
 import {
-    clearDb,
     getAllUsers,
     userData,
     shouldHaveValidTokensInCookies,
@@ -21,7 +20,7 @@ describe("POST /auth/register", () => {
 
     beforeEach(async () => {
         // delete all users created
-        await clearDb();
+        await db.clear();
     });
     afterAll(async () => {
         // disconnect db

@@ -3,7 +3,6 @@ import app from "../../src/app";
 import { db } from "../../src/utils/db";
 import getDefaultProfileImageAndType from "../../src/helpers";
 import {
-    clearDb,
     createAccessToken,
     createUser,
     deleteUser,
@@ -19,7 +18,7 @@ describe("GET /self/avatar", () => {
     });
 
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
 
     afterAll(async () => {

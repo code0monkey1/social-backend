@@ -1,15 +1,15 @@
+import { db } from "./../../../src/utils/db";
 import supertest from "supertest";
-import app from "../../src/app";
+import app from "../../../src/app";
 import {
-    clearDb,
     createAccessToken,
     createUser,
     deleteUser,
     getUserById,
     userData,
-} from "../testHelpers";
-import { db } from "../../src/utils/db";
-import User from "../../src/models/user.model";
+} from "../../testHelpers";
+
+import User from "../../../src/models/user.model";
 const api = supertest(app);
 const BASE_URL = "/users";
 
@@ -19,7 +19,7 @@ describe("PATCH /users/:userId/follow", () => {
     });
 
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
 
     afterAll(async () => {

@@ -1,8 +1,8 @@
-import { addFollowing, createAccessToken } from "./../testHelpers/index";
-import { db } from "./../../src/utils/db";
-import app from "../../src/app";
+import { addFollowing, createAccessToken } from "../../testHelpers/index";
+import { db } from "../../../src/utils/db";
 import request from "supertest";
-import { clearDb, createUser, userData } from "../testHelpers";
+import { createUser, userData } from "../../testHelpers";
+import app from "../../../src/app";
 const api = request(app);
 let userId;
 const BASE_URL = `/users/${userId}/recommendations`;
@@ -13,7 +13,7 @@ describe("GET /users/:userId/recommendations", () => {
     });
 
     afterEach(async () => {
-        await clearDb();
+        await db.clear();
     });
 
     afterAll(async () => {
