@@ -86,7 +86,7 @@ export async function shouldHaveValidTokensInCookies(response: any) {
     expect(isJwt(refreshToken)).toBeTruthy();
 }
 
-export const deletedUserId = "6647ba93ab53630b4aa7ee38";
+export const DELETED_USER_ID = "6647ba93ab53630b4aa7ee38";
 
 export async function createRefreshToken(
     userId: string,

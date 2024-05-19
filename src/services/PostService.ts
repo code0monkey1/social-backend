@@ -1,0 +1,10 @@
+import { PostType } from "../models/post.model";
+import { PostRepository } from "../repositories/PostRepository";
+
+export class PostService {
+    constructor(private readonly postRepository: PostRepository) {}
+
+    createPost = async (postBody: Partial<PostType>) => {
+        return await this.postRepository.cratePost(postBody);
+    };
+}

@@ -4,7 +4,7 @@ import {
     addFollowing,
     createAccessToken,
     createUser,
-    deletedUserId,
+    DELETED_USER_ID,
     getUserById,
     userData,
 } from "../../testHelpers/index";
@@ -93,7 +93,7 @@ describe("/users/:userId/unfollow", () => {
             const accessToken = await createAccessToken(user);
 
             await api
-                .patch(`/users/${deletedUserId}/unfollow`)
+                .patch(`/users/${DELETED_USER_ID}/unfollow`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(404);
         });

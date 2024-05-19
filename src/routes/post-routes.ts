@@ -1,32 +1,24 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Router, Request, NextFunction, Response } from "express";
-import Post, { PostType } from "../models/post.model";
-import { AuthRequest } from "../controllers/AuthController";
+import { PostService } from "./../services/PostService";
+import { Router } from "express";
+import authenticate from "../middleware/authenticate";
+import postValidator from "../validators/post-validator";
+import { hasAuthorization } from "../middleware/hasAuthorization";
+import { PostController } from "../controllers/PostController";
+import { PostRepository } from "../repositories/PostRepository";
 
 const route = Router();
 
-// user post routes
+const postRepository = new PostRepository();
+const postService = new PostService(postRepository);
+const postController = new PostController(postService);
 
 route.post(
     "/:userId/posts",
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const _req = req as AuthRequest;
-
-            const body = req.body as PostType;
-
-            const postBody: Partial<PostType> = {
-                postedBy: _req.auth.userId,
-                text: body.text,
-            };
-
-            const post = await Post.create(postBody);
-
-            res.status(201).json(post);
-        } catch (e) {
-            next(e);
-        }
-    },
+    authenticate,
+    hasAuthorization,
+    postValidator,
+    postController.createPost,
 );
 
 export default route;

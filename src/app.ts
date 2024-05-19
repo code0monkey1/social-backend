@@ -1,16 +1,13 @@
 import express, { NextFunction, Request, Response } from "express";
 import logger from "./config/logger";
 import { HttpError } from "http-errors";
-const app = express();
 import authRouter from "./routes/auth-routes";
 import userRouter from "./routes/user-routes";
 import selfRouter from "./routes/self-routes";
 import postRouter from "./routes/post-routes";
 import cookieParse from "cookie-parser";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-// Save the original append method
-// eslint-disable-next-line @typescript-eslint/unbound-method
+const app = express();
 
 const cookieParser = cookieParse();
 

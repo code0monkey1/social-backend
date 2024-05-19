@@ -4,8 +4,6 @@ import request from "supertest";
 import { createUser, userData } from "../../testHelpers";
 import app from "../../../src/app";
 const api = request(app);
-let userId;
-const BASE_URL = `/users/${userId}/recommendations`;
 
 describe("GET /users/:userId/recommendations", () => {
     beforeAll(async () => {
@@ -22,7 +20,9 @@ describe("GET /users/:userId/recommendations", () => {
 
     describe("happy path", () => {
         it("should return json response", async () => {
-            userId = 1;
+            const userId = 1;
+            const BASE_URL = getBaseUrl(userId);
+
             await api.get(BASE_URL).expect("Content-Type", /json/);
         });
 
@@ -42,12 +42,12 @@ describe("GET /users/:userId/recommendations", () => {
             const accessToken = await createAccessToken(user);
 
             addFollowing(user, followingUser);
-            userId = user._id.toString();
 
             expect(user.following?.map((f) => f.toString())).toContain(
                 followingUser._id.toString(),
             );
-
+            let userId = user._id.toString();
+            const BASE_URL = getBaseUrl(userId);
             const response = await api
                 .get(`${BASE_URL}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
@@ -79,7 +79,8 @@ describe("GET /users/:userId/recommendations", () => {
             const accessToken = await createAccessToken(user);
 
             addFollowing(user, followingUser);
-            userId = user._id.toString();
+            let userId = user._id.toString();
+            const BASE_URL = getBaseUrl(userId);
 
             expect(user.following?.map((f) => f.toString())).toContain(
                 followingUser._id.toString(),
@@ -104,8 +105,15 @@ describe("GET /users/:userId/recommendations", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if no accessToken is provided", async () => {
-            const userId = 1;
+            let userId = 1;
+            const BASE_URL = getBaseUrl(userId);
             await api.get(`${BASE_URL}`).expect(401);
         });
     });
 });
+
+export const getBaseUrl = (userId: number | string) => {
+    const BASE_URL = `/users/${userId}/recommendations`;
+
+    return BASE_URL;
+};
