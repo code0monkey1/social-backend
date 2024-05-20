@@ -41,7 +41,7 @@ describe("GET /users/:userId/recommendations", () => {
 
             const accessToken = await createAccessToken(user);
 
-            addFollowing(user, followingUser);
+            await addFollowing(user, followingUser);
 
             expect(user.following?.map((f) => f.toString())).toContain(
                 followingUser._id.toString(),
@@ -78,7 +78,8 @@ describe("GET /users/:userId/recommendations", () => {
 
             const accessToken = await createAccessToken(user);
 
-            addFollowing(user, followingUser);
+            await addFollowing(user, followingUser);
+
             let userId = user._id.toString();
             const BASE_URL = getBaseUrl(userId);
 

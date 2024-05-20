@@ -7,7 +7,7 @@ import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepos
 import RefreshToken from "../../src/models/refresh.token.model";
 import User, { UserType } from "../../src/models/user.model";
 const refreshTokenRepository = new RefreshTokenRepository();
-
+import Post from "../../src/models/post.model";
 export async function createUser(user: any) {
     return userRepository.create({
         ...user,
@@ -146,6 +146,10 @@ export async function deleteRefreshTokens() {
 
 export async function getUserById(userId: string): Promise<UserType> {
     return (await User.findById(userId)) as UserType;
+}
+
+export async function getPostById(postId: string) {
+    return await Post.findById(postId);
 }
 
 export async function getAllUsers() {

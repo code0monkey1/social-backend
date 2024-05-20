@@ -23,9 +23,6 @@ describe("GET /self", () => {
     });
 
     describe("happy path", () => {
-        it("should return json response", async () => {
-            await api.get(BASE_URL).expect("Content-Type", /json/);
-        });
         it("should get the user by auth userId in the request", async () => {
             const savedUser = await createUser(userData);
             const accessToken = await createAccessToken(savedUser);
@@ -36,6 +33,9 @@ describe("GET /self", () => {
                 .expect(200);
 
             expect(response.body.name).toBe(userData.name);
+        });
+        it("should return json response", async () => {
+            await api.get(BASE_URL).expect("Content-Type", /json/);
         });
     });
 
