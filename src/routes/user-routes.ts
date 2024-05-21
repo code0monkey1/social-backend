@@ -10,7 +10,12 @@ const route = Router();
 
 const userController = makeUserController();
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({
+    dest: "uploads/",
+    limits: {
+        fileSize: 16 * 1024 * 1024, //16mb
+    },
+});
 
 route.get("/:userId", authenticate, hasAuthorization, userController.findById);
 

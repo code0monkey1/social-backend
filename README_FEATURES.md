@@ -3,7 +3,7 @@
 -   [x] User profile with a description and a photo
 -   [x] Users following each other
 -   [x] Who to follow suggestions
--   [ ] Posting messages with photos
+-   [x] Posting messages with photos
 -   [ ] NewsFeed with posts from followed users
 -   [ ] Listing posts by user
 -   [ ] Liking posts

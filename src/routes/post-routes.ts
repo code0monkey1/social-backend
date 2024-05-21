@@ -10,7 +10,12 @@ import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 
 const route = Router();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({
+    dest: "uploads/",
+    limits: {
+        fileSize: 16 * 1024 * 1024, //16mb
+    },
+});
 
 const postRepository = new PostRepository();
 const postService = new PostService(postRepository);

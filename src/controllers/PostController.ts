@@ -6,6 +6,7 @@ import { PostService } from "../services/PostService";
 import fs from "fs";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
+
 export class PostController {
     constructor(private readonly postService: PostService) {}
 

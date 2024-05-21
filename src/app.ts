@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import logger from "./config/logger";
+import multer from "multer";
 import { HttpError } from "http-errors";
 import authRouter from "./routes/auth-routes";
 import userRouter from "./routes/user-routes";
@@ -26,7 +27,9 @@ app.use("/users", postRouter);
 app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
-        logger.error(error.message);
+        logger.error(error);
+        if (error instanceof multer.MulterError)
+            error.statusCode = multerErrorStatusCodes[error.code];
         const statusCode = error.statusCode || error.status || 500;
 
         res.status(statusCode).json({
@@ -42,5 +45,15 @@ app.use(
         });
     },
 );
+
+const multerErrorStatusCodes = {
+    LIMIT_PART_COUNT: 400,
+    LIMIT_FILE_SIZE: 413,
+    LIMIT_FILE_COUNT: 400,
+    LIMIT_FIELD_KEY: 400,
+    LIMIT_FIELD_VALUE: 400,
+    LIMIT_FIELD_COUNT: 400,
+    LIMIT_UNEXPECTED_FILE: 400,
+};
 
 export default app;
