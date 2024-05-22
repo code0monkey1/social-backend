@@ -7,4 +7,8 @@ export class PostService {
     createPost = async (postBody: Partial<PostType>) => {
         return await this.postRepository.cratePost(postBody);
     };
+
+    updatePost = async (postId: string, postBody: Partial<PostType>) => {
+        return await this.postRepository.updatePost(postId, postBody);
+    };
 }

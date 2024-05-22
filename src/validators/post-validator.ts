@@ -1,6 +1,6 @@
 import { checkSchema } from "express-validator";
 
-export default checkSchema({
+export const postValidator = checkSchema({
     postedBy: {
         errorMessage: "postedBy is missing",
         notEmpty: true,

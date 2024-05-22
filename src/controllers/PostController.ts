@@ -52,4 +52,40 @@ export class PostController {
             next(e);
         }
     };
+    updatePost = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const updateBody = req.body as Partial<PostType>;
+
+            const result = validationResult(req);
+
+            if (!result.isEmpty()) {
+                return res.status(400).json({ errors: result.array() });
+            }
+
+            if (req.file) {
+                updateBody.photo = {
+                    data: fs.readFileSync(req.file.path),
+                    contentType: req.file.mimetype,
+                };
+
+                //delete file
+                fs.unlink(req.file.path, (err) => {
+                    if (err) {
+                        logger.error(err);
+                        const error = createHttpError(400, `Invalid file type`);
+                        return next(error);
+                    }
+                });
+            }
+
+            const updatedPost = await this.postService.updatePost(
+                req.params.postId,
+                updateBody,
+            );
+
+            res.json(updatedPost);
+        } catch (e) {
+            next(e);
+        }
+    };
 }
