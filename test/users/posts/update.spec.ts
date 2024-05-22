@@ -1,14 +1,15 @@
 import {
     DELETED_USER_ID,
     createAccessToken,
+    createPost,
     createUser,
+    findAllPosts,
     getPostById,
     userData,
 } from "./../../testHelpers/index";
 import { db } from "../../../src/utils/db";
 import supertest from "supertest";
 import app from "../../../src/app";
-import Post from "../../../src/models/post.model";
 
 const api = supertest(app);
 describe("PATCH /users/:userId/posts/:postId", () => {
@@ -42,10 +43,11 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
 
-            const post = await Post.create({
+            const post = await createPost({
                 postedBy: userId,
                 text: "original_text",
             });
+
             const BASE_URL = getBaseUrl(userId, post._id.toString());
 
             // set access token as cookie
@@ -65,7 +67,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
 
-            const post = await Post.create({
+            const post = await createPost({
                 text: "original_text",
                 postedBy: userId,
             });
@@ -169,7 +171,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
 
             expect(response.body.errors[0].message).toBe("File too large");
 
-            const posts = await Post.find({});
+            const posts = await findAllPosts();
 
             expect(posts.length).toBe(0);
         });
@@ -179,7 +181,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
 
-            const post = await Post.create({
+            const post = await createPost({
                 postedBy: DELETED_USER_ID,
                 text: "original_text",
             });
@@ -203,7 +205,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
 
-            const post = await Post.create({
+            const post = await createPost({
                 postedBy: userId,
                 text: "original_text",
             });

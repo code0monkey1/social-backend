@@ -7,7 +7,7 @@ import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepos
 import RefreshToken from "../../src/models/refresh.token.model";
 import User, { UserType } from "../../src/models/user.model";
 const refreshTokenRepository = new RefreshTokenRepository();
-import Post from "../../src/models/post.model";
+import Post, { PostType } from "../../src/models/post.model";
 export async function createUser(user: any) {
     return userRepository.create({
         ...user,
@@ -25,6 +25,14 @@ export async function createAccessToken(user: any, ttlInMs = 1000 * 60 * 60) {
             expiresIn: ttlInMs,
         },
     );
+}
+export async function createPost(updateBody: Partial<PostType>) {
+    const post = await Post.create(updateBody);
+    return post;
+}
+
+export async function findAllPosts() {
+    return await Post.find({});
 }
 
 export async function shouldBeDifferentRefreshTokens(
