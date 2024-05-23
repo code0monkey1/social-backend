@@ -13,8 +13,8 @@
 
 ## Post Routes
 
-    - /users/:userId/posts
-    - /users/:userId/posts/:postId
+    - /posts
+    - /posts/:postId
 
 ## Follow Routes
 

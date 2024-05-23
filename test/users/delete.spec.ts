@@ -11,8 +11,9 @@ import { db } from "../../src/utils/db";
 import { Config } from "../../src/config";
 import jwt from "jsonwebtoken";
 import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepository";
+import { userData } from "../testHelpers";
 
-describe("DELETE /:userId", () => {
+describe("DELETE /users/:userId", () => {
     beforeAll(async () => {
         userRepository = new UserRepository();
         refreshTokenRepository = new RefreshTokenRepository();
@@ -92,21 +93,19 @@ describe("DELETE /:userId", () => {
             await api.delete(BASE_URL + `/${userId}`).expect(401);
         });
 
-        it("should return 401 when auth userId not authorized to delete user", async () => {
-            const user = {
-                name: "test",
-                email: "test@gmail.com",
-                password: "testfhsr",
-            };
-
-            const createdUser = await createUser(user);
+        it("should return 403 when auth userId not authorized to delete user", async () => {
+            const createdUser = await createUser(userData);
+            const otherUser = await createUser({
+                ...userData,
+                email: "other_user@gmail.com",
+            });
 
             const accessToken = await createAccessToken(createdUser);
 
             await api
-                .delete(BASE_URL + `/${userId}`)
+                .delete(BASE_URL + `/${otherUser._id.toString()}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .expect(401);
+                .expect(403);
         });
 
         it("should return 404 when user does not exist", async () => {

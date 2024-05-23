@@ -12,7 +12,7 @@ import supertest from "supertest";
 import app from "../../../src/app";
 
 const api = supertest(app);
-describe("PATCH /users/:userId/posts/:postId", () => {
+describe("PATCH posts/:postId", () => {
     beforeAll(async () => {
         await db.connect();
     });
@@ -27,7 +27,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
         it("should return json response", async () => {
             const userId = "1";
             const postId = "1";
-            const BASE_URL = getBaseUrl(userId, postId);
+            const BASE_URL = getBaseUrl(postId);
 
             await api
                 .patch(BASE_URL)
@@ -48,7 +48,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
                 text: "original_text",
             });
 
-            const BASE_URL = getBaseUrl(userId, post._id.toString());
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             // set access token as cookie
             const response = await api
@@ -73,7 +73,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             });
 
             const postId = post._id.toString();
-            const BASE_URL = getBaseUrl(userId, postId);
+            const BASE_URL = getBaseUrl(postId);
 
             // set access token as cookie
             const response = await api
@@ -97,44 +97,9 @@ describe("PATCH /users/:userId/posts/:postId", () => {
         it("should return 401 if accessToken is not provided as cookie in request", async () => {
             const userId = "1";
             const postId = "2";
-            const BASE_URL = getBaseUrl(userId, postId);
+            const BASE_URL = getBaseUrl(postId);
 
             await api.patch(BASE_URL).send({}).expect(401);
-        });
-
-        it("should return 400 if userId is of invalid type", async () => {
-            const user = await createUser(userData);
-            const accessToken = await createAccessToken(user);
-            const userId = user._id.toString();
-            const BASE_URL = getBaseUrl("1234567890", userId);
-
-            //add cookie
-            await api
-                .patch(BASE_URL)
-                .send({
-                    text: "test",
-                    postedBy: userId,
-                })
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(400);
-        });
-        it("should return 401 if url userId is not same as auth userId", async () => {
-            const user = await createUser(userData);
-            const accessToken = await createAccessToken(user);
-
-            const userId = DELETED_USER_ID;
-
-            const BASE_URL = getBaseUrl(userId, userId);
-
-            //add cookie
-            await api
-                .patch(BASE_URL)
-                .send({
-                    text: "test",
-                    postedBy: userId,
-                })
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(401);
         });
 
         //     //DONE:'should return 400 "Invalid file type" when file uploaded for post is not a photo'
@@ -143,7 +108,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             const userId = user?._id.toString();
             const accessToken = await createAccessToken(user);
 
-            const BASE_URL = getBaseUrl(userId, userId);
+            const BASE_URL = getBaseUrl(userId);
 
             const result = await api
                 .patch(`${BASE_URL}`)
@@ -158,7 +123,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
             const user = await createUser(userData);
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId, userId);
+            const BASE_URL = getBaseUrl(userId);
 
             // set access token as cookie
             const response = await api
@@ -185,7 +150,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
                 postedBy: DELETED_USER_ID,
                 text: "original_text",
             });
-            const BASE_URL = getBaseUrl(userId, post._id.toString());
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             // set access token as cookie
             const response = await api
@@ -210,7 +175,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
                 text: "original_text",
             });
 
-            const BASE_URL = getBaseUrl(userId, post._id.toString());
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             // set access token as cookie
             const response = await api
@@ -228,7 +193,7 @@ describe("PATCH /users/:userId/posts/:postId", () => {
     });
 });
 
-export const getBaseUrl = (userId: string, postId: string) => {
-    const BASE_URL = `/users/${userId}/posts/${postId}`;
+export const getBaseUrl = (postId: string) => {
+    const BASE_URL = `/posts/${postId}`;
     return BASE_URL;
 };

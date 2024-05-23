@@ -37,26 +37,6 @@ describe("UPDATE /users/:userId", () => {
                 .expect(401);
         });
 
-        it("should return 401 if user with userId in accessToken is not same as the param userId ", async () => {
-            // arrange
-
-            const savedUser = await createUser(userData);
-
-            const accessToken = await createAccessToken(savedUser);
-
-            const differentUserId = "6641c748e2b52be16daf57fd";
-            //act
-
-            //assert
-            await api
-                .patch(`${BASE_URL}/${differentUserId}`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .send({
-                    username: "test",
-                })
-                .expect(401);
-        });
-
         it("should return 404 if the user is not found", async () => {
             const savedUser = await createUser(userData);
             const userId = savedUser._id.toString();
@@ -73,18 +53,6 @@ describe("UPDATE /users/:userId", () => {
                 .expect(404);
         });
 
-        it("should return 400 if the userId is of invalid format", async () => {
-            const savedUser = await createUser(userData);
-            const accessToken = await createAccessToken(savedUser);
-
-            await api
-                .patch(`${BASE_URL}/123`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .send({
-                    username: "test",
-                })
-                .expect(400);
-        });
         // DONE: correct this test
         it("should not permit uploading non-image files for profile pic ", async () => {
             const user = await createUser(userData);

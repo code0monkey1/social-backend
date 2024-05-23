@@ -11,7 +11,7 @@ import { db } from "../../../src/utils/db";
 
 const api = supertest(app);
 
-describe("delete /user/:userId/post/:postId", () => {
+describe("delete posts/:postId", () => {
     beforeAll(async () => {
         await db.connect();
     });
@@ -26,7 +26,7 @@ describe("delete /user/:userId/post/:postId", () => {
 
     describe("happy path", () => {
         it("should return json response", async () => {
-            const BASE_URL = getBaseUrl("1", "1");
+            const BASE_URL = getBaseUrl("1");
             await api.delete(BASE_URL).expect("Content-Type", /json/);
         });
         it("should delete post when user is authorized to delete post", async () => {
@@ -39,10 +39,7 @@ describe("delete /user/:userId/post/:postId", () => {
                 text: "original_text",
             });
 
-            const BASE_URL = getBaseUrl(
-                user._id.toString(),
-                post._id.toString(),
-            );
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             const postBefore = await getPostById(post._id.toString());
 
@@ -61,7 +58,7 @@ describe("delete /user/:userId/post/:postId", () => {
 
     describe("unhappy path", () => {
         it("should return 401 , when auth cookie not provided", async () => {
-            const BASE_URL = getBaseUrl("1", "1");
+            const BASE_URL = getBaseUrl("1");
             await api.delete(BASE_URL).expect(401);
         });
 
@@ -75,10 +72,7 @@ describe("delete /user/:userId/post/:postId", () => {
                 text: "original_text",
             });
 
-            const BASE_URL = getBaseUrl(
-                user._id.toString(),
-                post._id.toString(),
-            );
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             await api
                 .delete(BASE_URL)
@@ -96,7 +90,7 @@ describe("delete /user/:userId/post/:postId", () => {
                 text: "original_text",
             });
 
-            const BASE_URL = getBaseUrl(user._id.toString(), "123");
+            const BASE_URL = getBaseUrl("123");
 
             await api
                 .delete(BASE_URL)
@@ -106,7 +100,7 @@ describe("delete /user/:userId/post/:postId", () => {
     });
 });
 
-export const getBaseUrl = (userId: string, postId: string) => {
-    const BASE_URL = `/users/${userId}/posts/${postId}`;
+export const getBaseUrl = (postId: string) => {
+    const BASE_URL = `/posts/${postId}`;
     return BASE_URL;
 };

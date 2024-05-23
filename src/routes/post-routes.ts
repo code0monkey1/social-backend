@@ -24,7 +24,7 @@ const postService = new PostService(postRepository);
 const postController = new PostController(postService);
 
 route.post(
-    "/:userId/posts",
+    "/",
     authenticate,
     hasAuthorization,
     upload.single("file"),
@@ -34,7 +34,7 @@ route.post(
 );
 
 route.patch(
-    "/:userId/posts/:postId",
+    "/:postId",
     authenticate,
     hasAuthorization,
     upload.single("file"),
@@ -45,7 +45,15 @@ route.patch(
 );
 
 route.delete(
-    "/:userId/posts/:postId",
+    "/:postId",
+    authenticate,
+    hasAuthorization,
+    hasPostMutationAuth,
+    postController.deletePost,
+);
+
+route.get(
+    "/:postId/photo",
     authenticate,
     hasAuthorization,
     hasPostMutationAuth,

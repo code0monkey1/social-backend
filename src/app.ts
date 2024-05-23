@@ -22,7 +22,7 @@ app.use("/users", userRouter);
 
 app.use("/self", selfRouter);
 
-app.use("/users", postRouter);
+app.use("/posts", postRouter);
 
 app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

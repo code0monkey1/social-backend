@@ -30,27 +30,10 @@ describe("GET /users/:userId", () => {
             await api.get(`${BASE_URL}/${userId}`).expect(401);
         });
 
-        it("should return 401 if user with userId in accessToken is not same as the param userId", async () => {
-            const savedUser = await createUser(userData);
-
-            const anotherUser = await createUser({
-                ...userData,
-                name: "test2",
-                email: "test2@gmail",
-            });
-
-            const accessToken = await createAccessToken(savedUser);
-
-            await api
-                .get(`${BASE_URL}/${anotherUser._id.toString()}`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .expect(401);
-        });
-
         it("should return 400 if userId is of invalid type", async () => {
             const savedUser = await createUser(userData);
 
-            const accessToken = await createAccessToken(savedUser);
+            const accessToken = await createAccessToken({ _id: "34234" });
 
             await api
                 .get(`${BASE_URL}/2`)

@@ -56,6 +56,13 @@ export class UserController {
     deleteById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // delete user by id
+
+            const _req = req as AuthRequest;
+
+            if (_req.auth.userId !== req.params.userId) {
+                throw createHttpError(403, "user is unauthorized");
+            }
+
             await this.userService.deleteById(req.params.userId);
 
             // delete all refreshTokens of user

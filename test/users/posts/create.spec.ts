@@ -11,7 +11,9 @@ import app from "../../../src/app";
 import Post from "../../../src/models/post.model";
 
 const api = supertest(app);
-describe("POST /users/:userId/posts", () => {
+const BASE_URL = "/posts";
+
+describe("POST /posts", () => {
     beforeAll(async () => {
         await db.connect();
     });
@@ -24,8 +26,6 @@ describe("POST /users/:userId/posts", () => {
 
     describe("happy path", () => {
         it("should return json response", async () => {
-            const userId = "1";
-            const BASE_URL = getBaseUrl(userId);
             await api
                 .post(BASE_URL)
                 .send({
@@ -39,7 +39,6 @@ describe("POST /users/:userId/posts", () => {
             const user = await createUser(userData);
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId);
 
             // set access token as cookie
             const response = await api
@@ -56,7 +55,6 @@ describe("POST /users/:userId/posts", () => {
             const user = await createUser(userData);
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId);
 
             // set access token as cookie
             const response = await api
@@ -78,9 +76,6 @@ describe("POST /users/:userId/posts", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if accessToken is not provided as cookie in request", async () => {
-            const userId = "1";
-            const BASE_URL = getBaseUrl(userId);
-
             await api.post(BASE_URL).send({}).expect(401);
         });
         it("should return 400 if title is not provided as validation error", async () => {
@@ -89,7 +84,6 @@ describe("POST /users/:userId/posts", () => {
             const accessToken = await createAccessToken(user);
 
             const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId);
 
             //add cookie
             await api
@@ -106,9 +100,6 @@ describe("POST /users/:userId/posts", () => {
 
             const accessToken = await createAccessToken(user);
 
-            const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId);
-
             //add cookie
             await api
                 .post(BASE_URL)
@@ -117,48 +108,13 @@ describe("POST /users/:userId/posts", () => {
                 })
                 .set("Cookie", `accessToken=${accessToken}`)
                 .expect(400);
-        });
-        it("should return 400 if userId is of invalid type", async () => {
-            const user = await createUser(userData);
-            const accessToken = await createAccessToken(user);
-            const userId = user._id.toString();
-            const BASE_URL = getBaseUrl("1234567890");
-
-            //add cookie
-            await api
-                .post(BASE_URL)
-                .send({
-                    text: "test",
-                    postedBy: userId,
-                })
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(400);
-        });
-        it("should return 401 if url userId is not same as auth userId", async () => {
-            const user = await createUser(userData);
-            const accessToken = await createAccessToken(user);
-
-            const userId = DELETED_USER_ID;
-            const BASE_URL = getBaseUrl(userId);
-
-            //add cookie
-            await api
-                .post(BASE_URL)
-                .send({
-                    text: "test",
-                    postedBy: userId,
-                })
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(401);
         });
 
         //DONE:'should return 400 "Invalid file type" when file uploaded for post is not a photo'
         it('should return 400 "Invalid file type" when file uploaded for post is not a photo', async () => {
             const user = await createUser(userData);
-            const userId = user?._id.toString();
-            const accessToken = await createAccessToken(user);
 
-            const BASE_URL = getBaseUrl(userId);
+            const accessToken = await createAccessToken(user);
 
             const result = await api
                 .post(`${BASE_URL}`)
@@ -173,7 +129,6 @@ describe("POST /users/:userId/posts", () => {
             const user = await createUser(userData);
             const accessToken = await createAccessToken(user);
             const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId);
 
             // set access token as cookie
             const response = await api
@@ -192,8 +147,3 @@ describe("POST /users/:userId/posts", () => {
         });
     });
 });
-
-export const getBaseUrl = (userId: string) => {
-    const BASE_URL = `/users/${userId}/posts`;
-    return BASE_URL;
-};
