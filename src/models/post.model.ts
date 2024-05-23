@@ -1,8 +1,6 @@
-// create a model for a post
-
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Schema, model } from "mongoose";
-
+import { v4 as uuid } from "uuid";
 export interface PhotoType {
     data: Buffer;
     contentType: string;
@@ -36,6 +34,11 @@ const PostSchema = new Schema<PostType>(
         },
         comments: [
             {
+                id: {
+                    type: String,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    default: () => uuid().replace(/-/g, ""),
+                },
                 text: {
                     type: String,
                     trim: true,

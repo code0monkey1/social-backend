@@ -88,4 +88,14 @@ export class PostController {
             next(e);
         }
     };
+
+    deletePost = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await this.postService.findByIdAndDelete(req.params.postId);
+
+            res.json();
+        } catch (e) {
+            next(e);
+        }
+    };
 }

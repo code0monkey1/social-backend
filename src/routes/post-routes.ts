@@ -44,4 +44,12 @@ route.patch(
     postController.updatePost,
 );
 
+route.delete(
+    "/:userId/posts/:postId",
+    authenticate,
+    hasAuthorization,
+    hasPostMutationAuth,
+    postController.deletePost,
+);
+
 export default route;

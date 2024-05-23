@@ -221,8 +221,6 @@ describe("PATCH /users/:userId/posts/:postId", () => {
                 })
                 .expect(400);
 
-            console.log(JSON.stringify(response.body, null, 2));
-
             expect(response?.body?.errors[0]?.msg).toBe(
                 `Text should be at least 5 characters`,
             );

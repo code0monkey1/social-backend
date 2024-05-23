@@ -8,4 +8,12 @@ export class PostRepository {
     updatePost = async (postId: string, postBody: Partial<PostType>) => {
         return await Post.findByIdAndUpdate(postId, postBody, { new: true });
     };
+
+    findPostById = async (postId: string) => {
+        return await Post.findById(postId);
+    };
+
+    findByIdAndDelete = async (postId: string) => {
+        return await Post.findByIdAndDelete(postId);
+    };
 }
