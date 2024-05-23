@@ -12,6 +12,9 @@ export const hasPostMutationAuth = async (
     try {
         const _req = req as AuthRequest;
 
+        if (!isValidObjectId(_req.auth.userId)) {
+            throw createHttpError(400, "userId is of invalid type");
+        }
         if (!isValidObjectId(req.params.postId)) {
             throw createHttpError(400, "postId is of invalid type");
         }

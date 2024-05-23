@@ -4,7 +4,6 @@ import { PostService } from "./../services/PostService";
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import { postValidator } from "../validators/post-validator";
-import { hasAuthorization } from "../middleware/hasAuthorization";
 import { PostController } from "../controllers/PostController";
 import { PostRepository } from "../repositories/PostRepository";
 import multer from "multer";
@@ -26,7 +25,6 @@ const postController = new PostController(postService);
 route.post(
     "/",
     authenticate,
-    hasAuthorization,
     upload.single("file"),
     parseImage,
     postValidator,
@@ -36,7 +34,6 @@ route.post(
 route.patch(
     "/:postId",
     authenticate,
-    hasAuthorization,
     upload.single("file"),
     parseImage,
     postUpdateValidator,
@@ -47,7 +44,6 @@ route.patch(
 route.delete(
     "/:postId",
     authenticate,
-    hasAuthorization,
     hasPostMutationAuth,
     postController.deletePost,
 );
@@ -55,7 +51,6 @@ route.delete(
 route.get(
     "/:postId/photo",
     authenticate,
-    hasAuthorization,
     hasPostMutationAuth,
     postController.deletePost,
 );

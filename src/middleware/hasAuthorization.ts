@@ -15,6 +15,10 @@ export const hasAuthorization = (
             throw createHttpError(400, "userId is of invalid type");
         }
 
+        if (authRequest.auth.userId !== req.params.userId) {
+            throw createHttpError(403, "user is unauthorized");
+        }
+
         next();
     } catch (e) {
         next(e);

@@ -81,10 +81,6 @@ export class UserService {
     async findById(userId: string) {
         const user = await this.userRepository.findById(userId);
 
-        await user?.populate("followers", "_id name");
-
-        await user?.populate("following", "_id name");
-
         if (!user) {
             const error = createHttpError(
                 404,
@@ -92,6 +88,13 @@ export class UserService {
             );
             throw error;
         }
+
+        await user?.populate("followers", "_id name");
+
+        await user?.populate("following", "_id name");
+
+        user.set("avatar", undefined);
+
         return user;
     }
 
