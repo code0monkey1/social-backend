@@ -1,14 +1,14 @@
 import {
-    DELETED_USER_ID,
     createAccessToken,
     createUser,
+    findAllPosts,
     getPostById,
     userData,
-} from "./../../testHelpers/index";
-import { db } from "../../../src/utils/db";
+} from "./../testHelpers";
+
 import supertest from "supertest";
-import app from "../../../src/app";
-import Post from "../../../src/models/post.model";
+import app from "../../src/app";
+import { db } from "../../src/utils/db";
 
 const api = supertest(app);
 const BASE_URL = "/posts";
@@ -141,7 +141,7 @@ describe("POST /posts", () => {
 
             expect(response.body.errors[0].message).toBe("File too large");
 
-            const posts = await Post.find({});
+            const posts = await findAllPosts();
 
             expect(posts.length).toBe(0);
         });

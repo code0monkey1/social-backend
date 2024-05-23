@@ -1,17 +1,18 @@
+import supertest from "supertest";
+import app from "../../src/app";
+import { db } from "../../src/utils/db";
 import {
-    DELETED_USER_ID,
+    createUser,
+    userData,
     createAccessToken,
     createPost,
-    createUser,
-    findAllPosts,
     getPostById,
-    userData,
-} from "./../../testHelpers/index";
-import { db } from "../../../src/utils/db";
-import supertest from "supertest";
-import app from "../../../src/app";
+    findAllPosts,
+    DELETED_USER_ID,
+} from "../testHelpers";
 
 const api = supertest(app);
+
 describe("PATCH posts/:postId", () => {
     beforeAll(async () => {
         await db.connect();

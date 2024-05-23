@@ -62,7 +62,7 @@ describe("UPDATE /users/:userId", () => {
             await api
                 .patch(`${BASE_URL}/${user?._id.toString()}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .attach("file", `${__dirname}/test-data/fake-text-pic.png`)
+                .attach("file", `${__dirname}/../test-data/fake-text-pic.png`)
                 .expect(400);
 
             const { avatar } = await getUserById(userId);
@@ -108,7 +108,7 @@ describe("UPDATE /users/:userId", () => {
             const response = await api
                 .patch(`${BASE_URL}/${userId}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .attach("file", `${__dirname}/test-data/test-pic.png`)
+                .attach("file", `${__dirname}/../test-data/test-pic.png`)
                 .expect(200);
 
             const savedUser = await getUserById(userId);

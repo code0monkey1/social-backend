@@ -1,13 +1,13 @@
-import { createAccessToken, getPostById } from "./../../testHelpers/index";
+import { createAccessToken, getPostById } from "../testHelpers/index";
 import supertest from "supertest";
-import app from "../../../src/app";
+import app from "../../src/app";
 import {
     DELETED_USER_ID,
     createPost,
     createUser,
     userData,
-} from "../../testHelpers";
-import { db } from "../../../src/utils/db";
+} from "../testHelpers";
+import { db } from "../../src/utils/db";
 
 const api = supertest(app);
 
