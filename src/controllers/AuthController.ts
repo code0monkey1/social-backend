@@ -171,6 +171,10 @@ export class AuthController {
     };
 }
 
+export interface UncommentType {
+    commentId: string;
+}
+
 export interface AuthRequest extends Request {
     auth: {
         userId: string;

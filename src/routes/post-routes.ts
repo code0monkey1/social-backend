@@ -75,6 +75,8 @@ router.get(
 
 router.put("/:postId/comment", authenticate, postController.comment);
 
+router.put("/:postId/uncomment", authenticate, postController.uncomment);
+
 //likes
 
 export default router;

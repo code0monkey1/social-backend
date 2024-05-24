@@ -27,4 +27,15 @@ export class PostRepository {
             .populate("postedBy", "_id name")
             .exec();
     };
+
+    uncomment = async (postId: string, commentId: string) => {
+        return await Post.findByIdAndUpdate(
+            postId,
+            { $pull: { comments: { _id: commentId } } },
+            { new: true },
+        )
+            .populate("comments.postedBy", "_id name")
+            .populate("postedBy", "_id name")
+            .exec();
+    };
 }

@@ -8,8 +8,9 @@ export interface PhotoType {
 
 export interface CommentType {
     text: string;
-    postedBy: Schema.Types.ObjectId;
+    postedBy: string;
     createdAt: Date;
+    _id: string;
 }
 
 export interface PostType {

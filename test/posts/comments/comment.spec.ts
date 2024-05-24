@@ -50,11 +50,6 @@ describe("PUT /posts/:postId/comment", () => {
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(201);
 
-            console.log(
-                "The response body from supertest",
-                JSON.stringify(response.body, null, 2),
-            );
-
             expect(response.body.comments?.length).toBe(1);
             expect(response.body.comments?.[0].text).toBe("my first comment");
         });
@@ -66,7 +61,25 @@ describe("PUT /posts/:postId/comment", () => {
 
             await api.put(BASE_URL).expect(401);
         });
+        it("should return 400 if the objectId of userId in auth request is of invalid type", async () => {
+            const post = await createPost({
+                text: "original_text",
+                postedBy: "23432423",
+            });
 
+            const BASE_URL = getBaseUrl(post._id.toString());
+
+            const accessToken = await createAccessToken({ _id: "23423" });
+
+            await api
+                .put(BASE_URL)
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .send({
+                    text: "my first comment",
+                    postedBy: "invalid",
+                })
+                .expect(400);
+        });
         it("should return 404 if post with given postId does not exist", async () => {
             const user = await createUser(userData);
 

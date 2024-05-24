@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { CommentType, PostType } from "../models/post.model";
-import { AuthRequest } from "./AuthController";
+import { AuthRequest, UncommentType } from "./AuthController";
 import { PostService } from "../services/PostService";
 import fs from "fs";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
+import { isValidObjectId } from "mongoose";
 
 export class PostController {
     constructor(private readonly postService: PostService) {}
@@ -101,13 +102,42 @@ export class PostController {
 
     comment = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { postId } = req.params;
-            //append the comment to the post
-            const comment = req.body as CommentType;
+            const _req = req as AuthRequest;
 
-            const savedPost = await this.postService.comment(postId, comment);
+            if (!isValidObjectId(_req.auth.userId)) {
+                throw createHttpError(400, "userId is of invalid type");
+            }
+
+            const { postId } = req.params;
+
+            const savedPost = await this.postService.comment(
+                postId,
+                req.body as CommentType,
+            );
 
             res.status(201).json(savedPost);
+        } catch (e) {
+            next(e);
+        }
+    };
+
+    uncomment = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { commentId } = req.body as UncommentType;
+
+            const _req = req as AuthRequest;
+
+            if (!isValidObjectId(_req.auth.userId)) {
+                throw createHttpError(400, "userId is of invalid type");
+            }
+
+            const updatedPost = await this.postService.uncomment(
+                req.params.postId,
+                commentId,
+                _req.auth.userId,
+            );
+
+            res.json(updatedPost);
         } catch (e) {
             next(e);
         }
