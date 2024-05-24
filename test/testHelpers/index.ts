@@ -15,6 +15,10 @@ export async function createUser(user: any) {
     });
 }
 
+export async function deletePost(postId: string) {
+    await Post.findByIdAndDelete(postId);
+}
+
 export async function createAccessToken(user: any, ttlInMs = 1000 * 60 * 60) {
     return await jwt.sign(
         {

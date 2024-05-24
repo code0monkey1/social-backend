@@ -6,7 +6,7 @@ import { hasAuthorization } from "../middleware/hasAuthorization";
 import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 
-const route = Router();
+const router = Router();
 
 const userController = makeUserController();
 
@@ -17,9 +17,9 @@ const upload = multer({
     },
 });
 
-route.get("/:userId", authenticate, hasAuthorization, userController.findById);
+router.get("/:userId", authenticate, hasAuthorization, userController.findById);
 
-route.patch(
+router.patch(
     "/:userId",
     authenticate,
     hasAuthorization,
@@ -28,9 +28,9 @@ route.patch(
     userController.updateById,
 );
 
-route.get("/", authenticate, userController.findAll);
+router.get("/", authenticate, userController.findAll);
 
-route.delete(
+router.delete(
     "/:userId",
     authenticate,
     hasAuthorization,
@@ -39,14 +39,14 @@ route.delete(
 
 // follow routes
 
-route.patch(
+router.patch(
     "/:userId/follow",
     authenticate,
     userController.addFollowing,
     userController.addFollower,
 );
 
-route.patch(
+router.patch(
     "/:userId/unfollow",
     authenticate,
     userController.removeFollowing,
@@ -55,10 +55,10 @@ route.patch(
 
 // user follow recommendations
 
-route.get(
+router.get(
     "/:userId/recommendations",
     authenticate,
     userController.recommendations,
 );
 
-export default route;
+export default router;

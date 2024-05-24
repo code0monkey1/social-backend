@@ -1,7 +1,7 @@
 import { postUpdateValidator } from "./../validators/post-update-validator";
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { PostService } from "./../services/PostService";
-import { Router } from "express";
+import { NextFunction, Response, Router, Request } from "express";
 import authenticate from "../middleware/authenticate";
 import { postValidator } from "../validators/post-validator";
 import { PostController } from "../controllers/PostController";
@@ -10,7 +10,7 @@ import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 import { hasPostMutationAuth } from "../middleware/hasPostMutationAuth";
 
-const route = Router();
+const router = Router();
 const upload = multer({
     dest: "uploads/",
     limits: {
@@ -22,7 +22,7 @@ const postRepository = new PostRepository();
 const postService = new PostService(postRepository);
 const postController = new PostController(postService);
 
-route.post(
+router.post(
     "/",
     authenticate,
     upload.single("file"),
@@ -31,7 +31,7 @@ route.post(
     postController.createPost,
 );
 
-route.patch(
+router.patch(
     "/:postId",
     authenticate,
     upload.single("file"),
@@ -41,18 +41,40 @@ route.patch(
     postController.updatePost,
 );
 
-route.delete(
+router.delete(
     "/:postId",
     authenticate,
     hasPostMutationAuth,
     postController.deletePost,
 );
 
-route.get(
-    "/:postId/photo",
+router.get(
+    "/:postId",
     authenticate,
-    hasPostMutationAuth,
-    postController.deletePost,
+    (req: Request, res: Response, next: NextFunction) => {
+        try {
+            res.json();
+        } catch (e) {
+            next(e);
+        }
+    },
 );
 
-export default route;
+router.get(
+    "/:postId/photo",
+    (req: Request, res: Response, next: NextFunction) => {
+        try {
+            res.json();
+        } catch (e) {
+            next(e);
+        }
+    },
+);
+
+//comments
+
+router.put("/:postId/comment", authenticate, postController.comment);
+
+//likes
+
+export default router;

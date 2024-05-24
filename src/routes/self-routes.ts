@@ -3,17 +3,17 @@ import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import { makeSelfController } from "../factories/controllers/self-controller-factory";
 
-const route = Router();
+const router = Router();
 
 const selfController = makeSelfController();
 
-route.get("/", authenticate, selfController.self);
+router.get("/", authenticate, selfController.self);
 
-route.get(
+router.get(
     "/avatar",
     authenticate,
     selfController.avatar,
     selfController.defaultAvatar,
 );
 
-export default route;
+export default router;

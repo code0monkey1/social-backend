@@ -7,16 +7,16 @@ import authenticate from "../middleware/authenticate";
 import parseRefreshToken from "../middleware/parseRefreshToken";
 import validateRefreshToken from "../middleware/validateRefreshToken";
 
-const route = Router();
+const router = Router();
 
 const authController = makeAuthController();
 
-route.post("/register", registerValidator, authController.register);
+router.post("/register", registerValidator, authController.register);
 
-route.post("/login", loginValidator, authController.login);
+router.post("/login", loginValidator, authController.login);
 
-route.post("/logout", authenticate, parseRefreshToken, authController.logout);
+router.post("/logout", authenticate, parseRefreshToken, authController.logout);
 
-route.post("/refresh", validateRefreshToken, authController.refresh);
+router.post("/refresh", validateRefreshToken, authController.refresh);
 
-export default route;
+export default router;

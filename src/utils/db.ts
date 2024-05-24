@@ -29,6 +29,7 @@ export const db = {
         try {
             await mongoose.connection.dropDatabase();
             await mongoose.disconnect();
+            await mongoose.connection.close();
 
             if (mockDb) await mockDb.stop();
         } catch (error) {

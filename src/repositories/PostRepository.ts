@@ -1,4 +1,4 @@
-import Post, { PostType } from "../models/post.model";
+import Post, { CommentType, PostType } from "../models/post.model";
 
 export class PostRepository {
     cratePost = async (postBody: Partial<PostType>) => {
@@ -9,11 +9,22 @@ export class PostRepository {
         return await Post.findByIdAndUpdate(postId, postBody, { new: true });
     };
 
-    findPostById = async (postId: string) => {
+    findById = async (postId: string) => {
         return await Post.findById(postId);
     };
 
     findByIdAndDelete = async (postId: string) => {
         return await Post.findByIdAndDelete(postId);
+    };
+
+    comment = async (postId: string, comment: CommentType) => {
+        return await Post.findByIdAndUpdate(
+            postId,
+            { $push: { comments: comment } },
+            { new: true },
+        )
+            .populate("comments.postedBy", "_id name")
+            .populate("postedBy", "_id name")
+            .exec();
     };
 }

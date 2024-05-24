@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { PostType } from "../models/post.model";
+import { CommentType, PostType } from "../models/post.model";
 import { AuthRequest } from "./AuthController";
 import { PostService } from "../services/PostService";
 import fs from "fs";
@@ -94,6 +94,20 @@ export class PostController {
             await this.postService.findByIdAndDelete(req.params.postId);
 
             res.json();
+        } catch (e) {
+            next(e);
+        }
+    };
+
+    comment = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { postId } = req.params;
+            //append the comment to the post
+            const comment = req.body as CommentType;
+
+            const savedPost = await this.postService.comment(postId, comment);
+
+            res.status(201).json(savedPost);
         } catch (e) {
             next(e);
         }
