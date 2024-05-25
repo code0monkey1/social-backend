@@ -28,7 +28,6 @@ export class PostController {
             };
 
             // if the request has file , then attach image to postBody
-
             if (req.file) {
                 postBody.photo = {
                     data: fs.readFileSync(req.file.path),

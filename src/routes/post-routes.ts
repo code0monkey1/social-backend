@@ -1,15 +1,15 @@
 import { postUpdateValidator } from "./../validators/post-update-validator";
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { PostService } from "./../services/PostService";
+
 import { NextFunction, Response, Router, Request } from "express";
 import authenticate from "../middleware/authenticate";
 import { postValidator } from "../validators/post-validator";
-import { PostController } from "../controllers/PostController";
-import { PostRepository } from "../repositories/PostRepository";
+
 import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 import { hasPostMutationAuth } from "../middleware/hasPostMutationAuth";
 import { commentValidator } from "../validators/comment-validator";
+import { makePostController } from "../factories/controllers/post-controller-factor";
 
 const router = Router();
 const upload = multer({
@@ -19,9 +19,7 @@ const upload = multer({
     },
 });
 
-const postRepository = new PostRepository();
-const postService = new PostService(postRepository);
-const postController = new PostController(postService);
+const postController = makePostController();
 
 router.post(
     "/",
