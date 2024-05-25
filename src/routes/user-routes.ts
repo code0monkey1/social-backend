@@ -2,7 +2,7 @@
 import { makeUserController } from "./../factories/controllers/user-controller-factory";
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
-import { hasAuthorization } from "../middleware/hasAuthorization";
+import { hasUserMutationAuth } from "../middleware/hasUserMutationAuth";
 import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 
@@ -17,12 +17,17 @@ const upload = multer({
     },
 });
 
-router.get("/:userId", authenticate, hasAuthorization, userController.findById);
+router.get(
+    "/:userId",
+    authenticate,
+    hasUserMutationAuth,
+    userController.findById,
+);
 
 router.patch(
     "/:userId",
     authenticate,
-    hasAuthorization,
+    hasUserMutationAuth,
     upload.single("file"),
     parseImage,
     userController.updateById,
@@ -33,7 +38,7 @@ router.get("/", authenticate, userController.findAll);
 router.delete(
     "/:userId",
     authenticate,
-    hasAuthorization,
+    hasUserMutationAuth,
     userController.deleteById,
 );
 

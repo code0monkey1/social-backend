@@ -142,4 +142,25 @@ export class PostController {
             next(e);
         }
     };
+
+    like = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as AuthRequest;
+
+            if (!isValidObjectId(_req.auth.userId)) {
+                throw createHttpError(400, "userId is of invalid type");
+            }
+
+            const { postId } = req.params;
+
+            const updatedPost = await this.postService.like(
+                postId,
+                _req.auth.userId,
+            );
+
+            res.json(updatedPost);
+        } catch (e) {
+            next(e);
+        }
+    };
 }

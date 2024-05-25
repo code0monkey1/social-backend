@@ -26,7 +26,6 @@ describe("PATCH posts/:postId", () => {
 
     describe("happy path", () => {
         it("should return json response", async () => {
-            const userId = "1";
             const postId = "1";
             const BASE_URL = getBaseUrl(postId);
 

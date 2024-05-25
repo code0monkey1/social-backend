@@ -28,6 +28,7 @@ app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
         logger.error(error);
+
         if (error instanceof multer.MulterError)
             error.statusCode = multerErrorStatusCodes[error.code];
         const statusCode = error.statusCode || error.status || 500;

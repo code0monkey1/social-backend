@@ -38,4 +38,12 @@ export class PostRepository {
             .populate("postedBy", "_id name")
             .exec();
     };
+
+    like = async (postId: string, userId: string) => {
+        return await Post.findByIdAndUpdate(
+            postId,
+            { $addToSet: { likes: userId } },
+            { new: true },
+        );
+    };
 }

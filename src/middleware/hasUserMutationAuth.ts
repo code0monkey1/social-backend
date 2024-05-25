@@ -3,7 +3,7 @@ import createHttpError from "http-errors";
 import { isValidObjectId } from "mongoose";
 import { AuthRequest } from "../controllers/AuthController";
 
-export const hasAuthorization = (
+export const hasUserMutationAuth = (
     req: Request,
     _res: Response,
     next: NextFunction,
