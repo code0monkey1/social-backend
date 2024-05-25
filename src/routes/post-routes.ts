@@ -4,10 +4,9 @@ import { postUpdateValidator } from "./../validators/post-update-validator";
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import { postValidator } from "../validators/post-validator";
-
 import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
-import { hasPostMutationAuth } from "../middleware/hasPostMutationAuth";
+import { isPoster } from "../middleware/isPoster";
 import { commentValidator } from "../validators/comment-validator";
 import { makePostController } from "../factories/controllers/post-controller-factory";
 
@@ -36,16 +35,11 @@ router.patch(
     upload.single("file"),
     parseImage,
     postUpdateValidator,
-    hasPostMutationAuth,
+    isPoster,
     postController.updatePost,
 );
 
-router.delete(
-    "/:postId",
-    authenticate,
-    hasPostMutationAuth,
-    postController.deletePost,
-);
+router.delete("/:postId", authenticate, isPoster, postController.deletePost);
 
 router.get("/:postId/photo", authenticate, postController.photo);
 

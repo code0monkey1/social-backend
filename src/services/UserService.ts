@@ -222,4 +222,12 @@ export class UserService {
 
         return recommendedUsers;
     };
+
+    getPosts = async (userId: string) => {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw createHttpError(404, `User with id ${userId} not found`);
+        }
+        return {};
+    };
 }

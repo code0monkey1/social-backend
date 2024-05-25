@@ -3,11 +3,7 @@ import createHttpError from "http-errors";
 
 import { AuthRequest } from "../controllers/AuthController";
 
-export const hasUserMutationAuth = (
-    req: Request,
-    _res: Response,
-    next: NextFunction,
-) => {
+export const isUser = (req: Request, _res: Response, next: NextFunction) => {
     try {
         const authRequest = req as AuthRequest;
 

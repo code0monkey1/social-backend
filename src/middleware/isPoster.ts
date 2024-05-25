@@ -3,7 +3,7 @@ import { AuthRequest } from "../controllers/AuthController";
 import createHttpError from "http-errors";
 import Post from "../models/post.model";
 
-export const hasPostMutationAuth = async (
+export const isPoster = async (
     req: Request,
     _res: Response,
     next: NextFunction,

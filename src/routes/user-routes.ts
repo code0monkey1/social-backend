@@ -2,7 +2,7 @@
 import { makeUserController } from "./../factories/controllers/user-controller-factory";
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
-import { hasUserMutationAuth } from "../middleware/hasUserMutationAuth";
+import { isUser } from "../middleware/isUser";
 import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 
@@ -17,17 +17,12 @@ const upload = multer({
     },
 });
 
-router.get(
-    "/:userId",
-    authenticate,
-    hasUserMutationAuth,
-    userController.findById,
-);
+router.get("/:userId", authenticate, isUser, userController.findById);
 
 router.patch(
     "/:userId",
     authenticate,
-    hasUserMutationAuth,
+    isUser,
     upload.single("file"),
     parseImage,
     userController.updateById,
@@ -35,12 +30,7 @@ router.patch(
 
 router.get("/", authenticate, userController.findAll);
 
-router.delete(
-    "/:userId",
-    authenticate,
-    hasUserMutationAuth,
-    userController.deleteById,
-);
+router.delete("/:userId", authenticate, isUser, userController.deleteById);
 
 // follow routes
 
@@ -65,5 +55,9 @@ router.get(
     authenticate,
     userController.recommendations,
 );
+
+// user posts
+
+router.get("/:userId/posts", authenticate, userController.getPosts);
 
 export default router;

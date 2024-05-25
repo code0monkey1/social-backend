@@ -24,10 +24,15 @@
     - /posts/:postId/like
     - /posts/:postId/unlike
 
+    - /posts/by/user/:userId
+
 ## Follow Routes
 
     - /users/:userId/follow
     - /users/:userId/unfollow
+
+## Recommendation
+
     - /users/:userId/recommendations
 
 ## Self Routes
