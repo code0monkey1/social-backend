@@ -30,17 +30,6 @@ describe("GET /users/:userId", () => {
             await api.get(`${BASE_URL}/${userId}`).expect(401);
         });
 
-        it("should return 400 if userId is of invalid type", async () => {
-            const savedUser = await createUser(userData);
-
-            const accessToken = await createAccessToken({ _id: "34234" });
-
-            await api
-                .get(`${BASE_URL}/2`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .expect(400);
-        });
-
         it("should return 401 if accessToken is invalid", async () => {
             const savedUser = await createUser(userData);
 

@@ -34,6 +34,7 @@ export class PostService {
 
         //add createdAt
         comment.createdAt = new Date(Date.now());
+
         return await this.postRepository.comment(postId, comment);
     };
     uncomment = async (postId: string, commentId: string, userId: string) => {
@@ -70,5 +71,19 @@ export class PostService {
         }
 
         return await this.postRepository.like(postId, userId);
+    };
+
+    unlike = async (postId: string, userId: string) => {
+        const post = await this.postRepository.findById(postId);
+
+        if (!post) {
+            throw createHttpError(404, "The post does not exist");
+        }
+
+        if (post.postedBy.toString() === userId) {
+            throw createHttpError(403, "user is unauthorized");
+        }
+
+        return await this.postRepository.unlike(postId, userId);
     };
 }

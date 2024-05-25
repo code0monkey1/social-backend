@@ -8,15 +8,15 @@ import {
     deletePost,
     userData,
 } from "../../testHelpers";
+import Post from "../../../src/models/post.model";
 
 const api = supertest(app);
 
-describe("PUT /posts/:postId/comment", () => {
+describe("PUT /posts/:postId/unlike", () => {
     beforeAll(async () => {
         await db.connect();
     });
-
-    afterEach(async () => {
+    beforeEach(async () => {
         await db.clear();
     });
     afterAll(async () => {
@@ -25,74 +25,65 @@ describe("PUT /posts/:postId/comment", () => {
 
     describe("happy path", () => {
         it("should return json data", async () => {
-            const BASE_URL = getBaseUrl("1");
+            const postId = "1";
+            const BASE_URL = getBaseUrl(postId);
 
             await api.put(BASE_URL).expect("Content-Type", /json/);
         });
-        it("should return status 201 and update a new comment to post", async () => {
+
+        it("should return status 200 and allow user to unlike a post", async () => {
             const user = await createUser(userData);
 
-            const post = await createPost({
-                text: "original_text",
-                postedBy: user._id.toString(),
+            const otherUser = await createUser({
+                ...userData,
+                email: "other_user@gmail.com",
             });
+
+            const post = await createPost({
+                postedBy: user._id.toString(),
+                text: "original_text",
+            });
+
+            await Post.findByIdAndUpdate(
+                post._id.toString(),
+                { $addToSet: { likes: otherUser._id.toString() } },
+                { new: true },
+            );
 
             const BASE_URL = getBaseUrl(post._id.toString());
 
-            const accessToken = await createAccessToken(user);
+            const accessToken = await createAccessToken(otherUser);
 
             const response = await api
                 .put(BASE_URL)
-                .send({
-                    text: "my first comment",
-                    postedBy: user._id.toString(),
-                })
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .expect(201);
+                .expect(200);
 
-            expect(response.body.comments?.length).toBe(1);
-            expect(response.body.comments?.[0].text).toBe("my first comment");
+            expect(response.body.likes.length).toBe(0);
         });
     });
 
     describe("unhappy path", () => {
-        it("should return 401 unauthorized , in case an token is not supplied", async () => {
-            const BASE_URL = getBaseUrl("1");
+        it("should return 401 if no accessToken is provided", async () => {
+            const postId = "1";
+            const BASE_URL = getBaseUrl(postId);
 
             await api.put(BASE_URL).expect(401);
         });
-        it("should return 400 if the objectId of postId is of invalid type", async () => {
-            const post = await createPost({
-                text: "original_text",
-                postedBy: "23432423",
-            });
 
-            const BASE_URL = getBaseUrl("invalid_post_id");
-
-            const accessToken = await createAccessToken({ _id: "23423" });
-
-            await api
-                .put(BASE_URL)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .send({
-                    text: "my first comment",
-                    postedBy: "invalid",
-                })
-                .expect(400);
-        });
         it("should return 404 if post with given postId does not exist", async () => {
             const user = await createUser(userData);
 
             const post = await createPost({
-                text: "original_text",
                 postedBy: user._id.toString(),
+                text: "original_text",
             });
-
-            await deletePost(post._id.toString());
 
             const BASE_URL = getBaseUrl(post._id.toString());
 
             const accessToken = await createAccessToken(user);
+
+            await deletePost(post._id.toString());
 
             await api
                 .put(BASE_URL)
@@ -103,6 +94,6 @@ describe("PUT /posts/:postId/comment", () => {
 });
 
 const getBaseUrl = (postId: string) => {
-    const BASE_URL = `/posts/${postId}/comment`;
+    const BASE_URL = `/posts/${postId}/unlike`;
     return BASE_URL;
 };

@@ -119,7 +119,7 @@ describe("PUT /posts/:postId/like", () => {
             expect(updatedPost?.likes.length).toBe(0);
         });
 
-        it("should return status 400, not allow user to like a post that does not exist", async () => {
+        it("should return status 400 if post does not exist", async () => {
             const user = await createUser(userData);
 
             const post = await createPost({

@@ -6,7 +6,6 @@ import { PostService } from "../services/PostService";
 import fs from "fs";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
-import { isValidObjectId } from "mongoose";
 
 export class PostController {
     constructor(private readonly postService: PostService) {}
@@ -102,12 +101,6 @@ export class PostController {
 
     comment = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const _req = req as AuthRequest;
-
-            if (!isValidObjectId(_req.auth.userId)) {
-                throw createHttpError(400, "userId is of invalid type");
-            }
-
             const { postId } = req.params;
 
             const savedPost = await this.postService.comment(
@@ -127,10 +120,6 @@ export class PostController {
 
             const _req = req as AuthRequest;
 
-            if (!isValidObjectId(_req.auth.userId)) {
-                throw createHttpError(400, "userId is of invalid type");
-            }
-
             const updatedPost = await this.postService.uncomment(
                 req.params.postId,
                 commentId,
@@ -147,13 +136,26 @@ export class PostController {
         try {
             const _req = req as AuthRequest;
 
-            if (!isValidObjectId(_req.auth.userId)) {
-                throw createHttpError(400, "userId is of invalid type");
-            }
-
             const { postId } = req.params;
 
             const updatedPost = await this.postService.like(
+                postId,
+                _req.auth.userId,
+            );
+
+            res.json(updatedPost);
+        } catch (e) {
+            next(e);
+        }
+    };
+
+    unlike = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as AuthRequest;
+
+            const { postId } = req.params;
+
+            const updatedPost = await this.postService.unlike(
                 postId,
                 _req.auth.userId,
             );

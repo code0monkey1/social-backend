@@ -81,4 +81,6 @@ router.put("/:postId/uncomment", authenticate, postController.uncomment);
 
 router.put("/:postId/like", authenticate, postController.like);
 
+router.put("/:postId/unlike", authenticate, postController.unlike);
+
 export default router;

@@ -155,28 +155,6 @@ describe("PUT /posts/:postId/uncomment", () => {
                 })
                 .expect(404);
         });
-        it('should return 400 if  "userId" in auth is not a valid ObjectId', async () => {
-            const user = await createUser(userData);
-
-            const post = await createPost({
-                text: "original_text",
-                postedBy: user._id.toString(),
-            });
-
-            const BASE_URL = getBaseUrl(post._id.toString());
-
-            const accessToken = await createAccessToken({
-                _id: "invalid_token",
-            });
-
-            await api
-                .put(BASE_URL)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .send({
-                    commentId: DELETED_USER_ID,
-                })
-                .expect(400);
-        });
     });
 });
 

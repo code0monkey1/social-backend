@@ -7,6 +7,7 @@ import userRouter from "./routes/user-routes";
 import selfRouter from "./routes/self-routes";
 import postRouter from "./routes/post-routes";
 import cookieParse from "cookie-parser";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -29,8 +30,13 @@ app.use(
     (error: HttpError, _req: Request, res: Response, _next: NextFunction) => {
         logger.error(error);
 
+        if (error instanceof mongoose.Error.CastError) {
+            error.statusCode = 400;
+            error.message = "Invalid id Mongoose id";
+        }
         if (error instanceof multer.MulterError)
             error.statusCode = multerErrorStatusCodes[error.code];
+
         const statusCode = error.statusCode || error.status || 500;
 
         res.status(statusCode).json({
