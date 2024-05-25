@@ -86,4 +86,14 @@ export class PostService {
 
         return await this.postRepository.unlike(postId, userId);
     };
+
+    photo = async (postId: string) => {
+        const post = await this.postRepository.findById(postId);
+
+        if (!post) {
+            throw createHttpError(404, "The post does not exist");
+        }
+
+        return post.photo;
+    };
 }

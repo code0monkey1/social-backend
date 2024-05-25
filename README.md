@@ -16,6 +16,7 @@
 
     - /posts
     - /posts/:postId
+    - /posts/:postId/photo
 
     - /posts/:postId/comment
     - /posts/:postId/uncomment

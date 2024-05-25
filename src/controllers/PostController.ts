@@ -170,4 +170,16 @@ export class PostController {
             next(e);
         }
     };
+
+    photo = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { postId } = req.params;
+
+            const photo = await this.postService.photo(postId);
+
+            res.json(photo);
+        } catch (e) {
+            next(e);
+        }
+    };
 }

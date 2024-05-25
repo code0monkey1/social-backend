@@ -1,7 +1,7 @@
 import { postUpdateValidator } from "./../validators/post-update-validator";
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
-import { NextFunction, Response, Router, Request } from "express";
+import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import { postValidator } from "../validators/post-validator";
 
@@ -9,7 +9,7 @@ import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 import { hasPostMutationAuth } from "../middleware/hasPostMutationAuth";
 import { commentValidator } from "../validators/comment-validator";
-import { makePostController } from "../factories/controllers/post-controller-factor";
+import { makePostController } from "../factories/controllers/post-controller-factory";
 
 const router = Router();
 const upload = multer({
@@ -47,16 +47,7 @@ router.delete(
     postController.deletePost,
 );
 
-router.get(
-    "/:postId/photo",
-    (req: Request, res: Response, next: NextFunction) => {
-        try {
-            res.json();
-        } catch (e) {
-            next(e);
-        }
-    },
-);
+router.get("/:postId/photo", authenticate, postController.photo);
 
 //comments
 
