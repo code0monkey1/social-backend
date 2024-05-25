@@ -9,6 +9,7 @@ import { PostRepository } from "../repositories/PostRepository";
 import multer from "multer";
 import { parseImage } from "../middleware/parseImage";
 import { hasPostMutationAuth } from "../middleware/hasPostMutationAuth";
+import { commentValidator } from "../validators/comment-validator";
 
 const router = Router();
 const upload = multer({
@@ -49,18 +50,6 @@ router.delete(
 );
 
 router.get(
-    "/:postId",
-    authenticate,
-    (req: Request, res: Response, next: NextFunction) => {
-        try {
-            res.json();
-        } catch (e) {
-            next(e);
-        }
-    },
-);
-
-router.get(
     "/:postId/photo",
     (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -73,7 +62,12 @@ router.get(
 
 //comments
 
-router.put("/:postId/comment", authenticate, postController.comment);
+router.put(
+    "/:postId/comment",
+    authenticate,
+    commentValidator,
+    postController.comment,
+);
 
 router.put("/:postId/uncomment", authenticate, postController.uncomment);
 

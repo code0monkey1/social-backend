@@ -96,8 +96,53 @@ describe("PUT /posts/:postId/comment", () => {
 
             await api
                 .put(BASE_URL)
+                .send({
+                    text: "my first comment",
+                    postedBy: user._id.toString(),
+                })
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(404);
+        });
+        it("should return status 400 , and not allow posting of comment with missing text field", async () => {
+            const user = await createUser(userData);
+
+            const post = await createPost({
+                text: "original_text",
+                postedBy: user._id.toString(),
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
+
+            const accessToken = await createAccessToken(user);
+
+            await api
+                .put(BASE_URL)
+                .send({
+                    postedBy: user._id.toString(),
+                })
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .expect(400);
+        });
+
+        it("should return status 400 , and not allow posting of comment with empty postedBy field", async () => {
+            const user = await createUser(userData);
+
+            const post = await createPost({
+                text: "original_text",
+                postedBy: user._id.toString(),
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
+
+            const accessToken = await createAccessToken(user);
+
+            await api
+                .put(BASE_URL)
+                .send({
+                    text: "",
+                })
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .expect(400);
         });
     });
 });

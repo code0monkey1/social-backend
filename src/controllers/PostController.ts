@@ -103,6 +103,12 @@ export class PostController {
         try {
             const { postId } = req.params;
 
+            const result = validationResult(req);
+
+            if (!result.isEmpty()) {
+                return res.status(400).json({ errors: result.array() });
+            }
+
             const savedPost = await this.postService.comment(
                 postId,
                 req.body as CommentType,
@@ -143,7 +149,7 @@ export class PostController {
                 _req.auth.userId,
             );
 
-            res.json(updatedPost);
+            res.status(201).json(updatedPost);
         } catch (e) {
             next(e);
         }

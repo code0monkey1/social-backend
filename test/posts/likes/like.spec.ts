@@ -49,7 +49,7 @@ describe("PUT /posts/:postId/like", () => {
             const response = await api
                 .put(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .expect(200);
+                .expect(201);
 
             expect(response.body.likes.length).toBe(1);
             expect(response.body.likes[0].toString()).toBe(user._id.toString());
@@ -89,7 +89,7 @@ describe("PUT /posts/:postId/like", () => {
             const response = await api
                 .put(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])
-                .expect(200);
+                .expect(201);
 
             expect(response.body.likes.length).toBe(1);
             expect(response.body.likes[0].toString()).toBe(
