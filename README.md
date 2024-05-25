@@ -3,8 +3,9 @@
 ## Auth Routes
 
     - /auth/login
-    - /auth/signup
+    - /auth/register
     - /auth/logout
+    - /auth/refresh
 
 ## Common User Routes
 
@@ -15,6 +16,12 @@
 
     - /posts
     - /posts/:postId
+
+    - /posts/:postId/comment
+    - /posts/:postId/uncomment
+
+    - /posts/:postId/like
+    - /posts/:postId/unlike
 
 ## Follow Routes
 
