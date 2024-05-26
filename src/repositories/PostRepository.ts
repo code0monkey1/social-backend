@@ -46,9 +46,9 @@ export class PostRepository {
             { new: true },
         );
     };
-    unlike = async (postId: string, userId: string) => {
+    unlike = async (post: PostType, userId: string) => {
         return await Post.findByIdAndUpdate(
-            postId,
+            post._id.toString(),
             { $pull: { likes: userId } },
             { new: true },
         );

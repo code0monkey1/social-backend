@@ -6,6 +6,7 @@ import { PostService } from "../services/PostService";
 import fs from "fs";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
+import { PostRequest } from "../middleware/types";
 
 export class PostController {
     constructor(private readonly postService: PostService) {}
@@ -60,6 +61,7 @@ export class PostController {
             if (!result.isEmpty()) {
                 return res.status(400).json({ errors: result.array() });
             }
+            const _req = req as PostRequest;
 
             if (req.file) {
                 updateBody.photo = {
@@ -78,7 +80,7 @@ export class PostController {
             }
 
             const updatedPost = await this.postService.updatePost(
-                req.params.postId,
+                _req.post._id.toString(),
                 updateBody,
             );
 
@@ -100,16 +102,16 @@ export class PostController {
 
     comment = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { postId } = req.params;
-
             const result = validationResult(req);
+
+            const _req = req as PostRequest;
 
             if (!result.isEmpty()) {
                 return res.status(400).json({ errors: result.array() });
             }
 
             const savedPost = await this.postService.comment(
-                postId,
+                _req.post._id.toString(),
                 req.body as CommentType,
             );
 
@@ -123,10 +125,10 @@ export class PostController {
         try {
             const { commentId } = req.body as UncommentType;
 
-            const _req = req as AuthRequest;
+            const _req = req as PostRequest & AuthRequest;
 
             const updatedPost = await this.postService.uncomment(
-                req.params.postId,
+                _req.post,
                 commentId,
                 _req.auth.userId,
             );
@@ -139,12 +141,10 @@ export class PostController {
 
     like = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const _req = req as AuthRequest;
-
-            const { postId } = req.params;
+            const _req = req as AuthRequest & PostRequest;
 
             const updatedPost = await this.postService.like(
-                postId,
+                _req.post,
                 _req.auth.userId,
             );
 
@@ -156,12 +156,10 @@ export class PostController {
 
     unlike = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const _req = req as AuthRequest;
-
-            const { postId } = req.params;
+            const _req = req as AuthRequest & PostRequest;
 
             const updatedPost = await this.postService.unlike(
-                postId,
+                _req.post,
                 _req.auth.userId,
             );
 
@@ -171,13 +169,34 @@ export class PostController {
         }
     };
 
-    photo = async (req: Request, res: Response, next: NextFunction) => {
+    photo = (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { postId } = req.params;
+            const _req = req as PostRequest;
 
-            const photo = await this.postService.photo(postId);
+            const postWithPhoto = this.postService.photo(_req.post);
 
-            res.json(photo);
+            res.json(postWithPhoto);
+        } catch (e) {
+            next(e);
+        }
+    };
+
+    getPostById = async (
+        req: Request,
+        _res: Response,
+        next: NextFunction,
+        id: string,
+    ) => {
+        try {
+            const post = await this.postService.findById(id);
+
+            if (!post) {
+                throw createHttpError(404, "The post does not exist");
+            }
+
+            const _req = req as PostRequest;
+            _req.post = post;
+            next();
         } catch (e) {
             next(e);
         }

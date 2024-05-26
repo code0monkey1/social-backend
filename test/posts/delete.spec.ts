@@ -57,8 +57,15 @@ describe("delete posts/:postId", () => {
     });
 
     describe("unhappy path", () => {
-        it("should return 401 , when auth cookie not provided", async () => {
-            const BASE_URL = getBaseUrl("1");
+        it("should return 401 , when auth token not provided", async () => {
+            const user = await createUser(userData);
+
+            const post = await createPost({
+                postedBy: user._id.toString(),
+                text: "original_text",
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
             await api.delete(BASE_URL).expect(401);
         });
 

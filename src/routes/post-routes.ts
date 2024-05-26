@@ -1,6 +1,5 @@
-import { postUpdateValidator } from "./../validators/post-update-validator";
 /* eslint-disable @typescript-eslint/no-misused-promises */
-
+import { postUpdateValidator } from "./../validators/post-update-validator";
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import { postValidator } from "../validators/post-validator";
@@ -59,5 +58,9 @@ router.put("/:postId/uncomment", authenticate, postController.uncomment);
 router.put("/:postId/like", authenticate, postController.like);
 
 router.put("/:postId/unlike", authenticate, postController.unlike);
+
+// common middleware triggered at the start of all postId routes
+
+router.param("postId", postController.getPostById);
 
 export default router;

@@ -57,15 +57,18 @@ describe("GET  /posts/:postId/photo ", () => {
                 .set("Cookie", `accessToken=${accessToken}`)
                 .expect(200);
 
-            expect(response.body.data).toBeDefined();
-            const responseBuffer = Buffer.from(response.body.data, "base64");
+            expect(response.body.photo.data).toBeDefined();
+            const responseBuffer = Buffer.from(
+                response.body.photo.data,
+                "base64",
+            );
             const originalBuffer = Buffer.from(
                 photo.data.toString("base64"),
                 "base64",
             );
             expect(Buffer.compare(responseBuffer, originalBuffer)).toEqual(0);
 
-            expect(response.body.contentType).toEqual(photo.contentType);
+            expect(response.body.photo.contentType).toEqual(photo.contentType);
         });
 
         it("should null if no photo is present in the post ", async () => {
@@ -92,7 +95,15 @@ describe("GET  /posts/:postId/photo ", () => {
 
     describe("unhappy path", () => {
         it("should return 401 unauthorized , in case an token is not supplied", async () => {
-            const BASE_URL = getBaseUrl("1");
+            const user = await createUser(userData);
+
+            const post = await createPost({
+                postedBy: user._id.toString(),
+                text: "some_text",
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
+
             await api.get(BASE_URL).expect(401);
         });
 

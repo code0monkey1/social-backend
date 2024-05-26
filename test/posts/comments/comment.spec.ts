@@ -57,7 +57,14 @@ describe("PUT /posts/:postId/comment", () => {
 
     describe("unhappy path", () => {
         it("should return 401 unauthorized , in case an token is not supplied", async () => {
-            const BASE_URL = getBaseUrl("1");
+            const user = await createUser(userData);
+
+            const post = await createPost({
+                text: "original_text",
+                postedBy: user._id.toString(),
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             await api.put(BASE_URL).expect(401);
         });

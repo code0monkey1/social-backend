@@ -1,23 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../controllers/AuthController";
 import createHttpError from "http-errors";
-import Post from "../models/post.model";
+import { PostRequest } from "./types";
 
-export const isPoster = async (
-    req: Request,
-    _res: Response,
-    next: NextFunction,
-) => {
+export const isPoster = (req: Request, _res: Response, next: NextFunction) => {
     try {
-        const _req = req as AuthRequest;
+        const _req = req as AuthRequest & PostRequest;
 
-        const post = await Post.findById(req.params.postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
-        }
-
-        if (post.postedBy !== _req.auth.userId) {
+        if (_req.post.postedBy !== _req.auth.userId) {
             throw createHttpError(403, "user is unauthorized");
         }
         next();

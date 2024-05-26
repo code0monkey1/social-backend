@@ -14,6 +14,7 @@ export interface CommentType {
 }
 
 export interface PostType {
+    _id: string;
     postedBy: string;
     text: string;
     photo?: PhotoType;

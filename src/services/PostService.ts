@@ -18,33 +18,17 @@ export class PostService {
     };
 
     findById = async (postId: string) => {
-        const post = await this.postRepository.findById(postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
-        }
+        return await this.postRepository.findById(postId);
     };
 
     comment = async (postId: string, comment: CommentType) => {
-        const post = await this.postRepository.findById(postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
-        }
-
         //add createdAt
         comment.createdAt = new Date(Date.now());
 
         return await this.postRepository.comment(postId, comment);
     };
-    uncomment = async (postId: string, commentId: string, userId: string) => {
-        const post = await this.postRepository.findById(postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
-        }
-
-        const comment = post.comments.find(
+    uncomment = async (post: PostType, commentId: string, userId: string) => {
+        const comment = post?.comments.find(
             (comment) => comment._id.toString() === commentId,
         );
 
@@ -56,44 +40,32 @@ export class PostService {
             throw createHttpError(403, "user is unauthorized");
         }
 
-        return await this.postRepository.uncomment(postId, commentId);
+        return await this.postRepository.uncomment(
+            post._id.toString(),
+            commentId,
+        );
     };
 
-    like = async (postId: string, userId: string) => {
-        const post = await this.postRepository.findById(postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
-        }
-
+    like = async (post: PostType, userId: string) => {
         if (post.postedBy.toString() === userId) {
             throw createHttpError(403, "user is unauthorized");
         }
 
-        return await this.postRepository.like(postId, userId);
+        return await this.postRepository.like(post._id.toString(), userId);
     };
 
-    unlike = async (postId: string, userId: string) => {
-        const post = await this.postRepository.findById(postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
-        }
-
+    unlike = async (post: PostType, userId: string) => {
         if (post.postedBy.toString() === userId) {
             throw createHttpError(403, "user is unauthorized");
         }
 
-        return await this.postRepository.unlike(postId, userId);
+        return await this.postRepository.unlike(post, userId);
     };
 
-    photo = async (postId: string) => {
-        const post = await this.postRepository.findById(postId);
-
-        if (!post) {
-            throw createHttpError(404, "The post does not exist");
+    photo = (post: PostType) => {
+        if (post.photo?.data) {
+            post.photo;
         }
-
-        return post.photo;
+        return post;
     };
 }

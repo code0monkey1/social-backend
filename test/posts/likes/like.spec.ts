@@ -58,7 +58,18 @@ describe("PUT /posts/:postId/like", () => {
 
     describe("unhappy path", () => {
         it("should return 401 response in case auth not provided", async () => {
-            const BASE_URL = getBaseUrl("1");
+            const user = await createUser(userData);
+            const anotherUser = await createUser({
+                ...userData,
+                email: "other_user@gmail.com",
+            });
+
+            const post = await createPost({
+                postedBy: anotherUser._id.toString(),
+                text: "original_text",
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             await api.put(BASE_URL).expect(401);
         });

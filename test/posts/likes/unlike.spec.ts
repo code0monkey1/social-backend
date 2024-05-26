@@ -65,8 +65,14 @@ describe("PUT /posts/:postId/unlike", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if no accessToken is provided", async () => {
-            const postId = "1";
-            const BASE_URL = getBaseUrl(postId);
+            const user = await createUser(userData);
+
+            const post = await createPost({
+                postedBy: user._id.toString(),
+                text: "original_text",
+            });
+
+            const BASE_URL = getBaseUrl(post._id.toString());
 
             await api.put(BASE_URL).expect(401);
         });

@@ -95,20 +95,34 @@ describe("PATCH posts/:postId", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if accessToken is not provided as cookie in request", async () => {
-            const userId = "1";
-            const postId = "2";
-            const BASE_URL = getBaseUrl(postId);
+            const user = await createUser(userData);
 
+            const userId = user._id.toString();
+
+            const post = await createPost({
+                text: "original_text",
+                postedBy: userId,
+            });
+
+            const postId = post._id.toString();
+            const BASE_URL = getBaseUrl(postId);
             await api.patch(BASE_URL).send({}).expect(401);
         });
 
         //     //DONE:'should return 400 "Invalid file type" when file uploaded for post is not a photo'
         it('should return 400 "Invalid file type" when file uploaded for post is not a photo', async () => {
             const user = await createUser(userData);
-            const userId = user?._id.toString();
-            const accessToken = await createAccessToken(user);
 
-            const BASE_URL = getBaseUrl(userId);
+            const userId = user._id.toString();
+
+            const post = await createPost({
+                text: "original_text",
+                postedBy: userId,
+            });
+
+            const postId = post._id.toString();
+            const BASE_URL = getBaseUrl(postId);
+            const accessToken = await createAccessToken(user);
 
             const result = await api
                 .patch(`${BASE_URL}`)
@@ -121,9 +135,17 @@ describe("PATCH posts/:postId", () => {
 
         it("should return status 413 , if file size is greater than 16mb", async () => {
             const user = await createUser(userData);
-            const accessToken = await createAccessToken(user);
+
             const userId = user._id.toString();
-            const BASE_URL = getBaseUrl(userId);
+
+            const post = await createPost({
+                text: "original_text",
+                postedBy: userId,
+            });
+
+            const postId = post._id.toString();
+            const BASE_URL = getBaseUrl(postId);
+            const accessToken = await createAccessToken(user);
 
             // set access token as cookie
             const response = await api
@@ -138,7 +160,8 @@ describe("PATCH posts/:postId", () => {
 
             const posts = await findAllPosts();
 
-            expect(posts.length).toBe(0);
+            expect(posts[0].photo?.data).toBeUndefined();
+            expect(posts[0].photo?.contentType).toBeUndefined();
         });
 
         it("should return status 403, if the user updating did not create the post ", async () => {
