@@ -28,7 +28,9 @@ describe("UPDATE /users/:userId", () => {
 
     describe("sad path", () => {
         it("should return 401 if no accessToken is provided", async () => {
-            const userId = "123";
+            const savedUser = await createUser(userData);
+            const userId = savedUser._id.toString();
+
             await api
                 .patch(`${BASE_URL}/${userId}`)
                 .send({

@@ -79,6 +79,7 @@ describe("GET /self/avatar", () => {
             const accessToken = await createAccessToken(savedUser);
 
             await deleteUser(savedUser._id.toString());
+
             await api
                 .get(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])

@@ -29,7 +29,15 @@ export class SelfController {
                 auth: { userId },
             } = req as AuthRequest;
 
-            const { _id } = await this.userService.findById(userId);
+            const user = await this.userService.findById(userId);
+
+            if (!user) {
+                throw createHttpError(404, "User not found");
+            }
+
+            const { _id } = (await this.userService.findById(userId)) as {
+                _id: string;
+            };
 
             const avatar = await this.userService.getUserAvatar(_id.toString());
 

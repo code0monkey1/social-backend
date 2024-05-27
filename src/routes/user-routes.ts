@@ -17,8 +17,6 @@ const upload = multer({
     },
 });
 
-router.get("/:userId", authenticate, isUser, userController.findById);
-
 router.patch(
     "/:userId",
     authenticate,
@@ -59,5 +57,9 @@ router.get(
 // user posts
 
 router.get("/:userId/posts", authenticate, userController.getPosts);
+
+// common middleware triggered at the start of all userId routes
+
+router.param("userId", userController.findById);
 
 export default router;

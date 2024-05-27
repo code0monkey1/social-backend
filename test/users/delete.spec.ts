@@ -90,7 +90,10 @@ describe("DELETE /users/:userId", () => {
 
     describe("un-happy path", () => {
         it("should return 401 when auth not provided", async () => {
-            await api.delete(BASE_URL + `/${userId}`).expect(401);
+            const createdUser = await createUser(userData);
+            await api
+                .delete(BASE_URL + `/${createdUser._id.toString()}`)
+                .expect(401);
         });
 
         it("should return 403 when auth userId not authorized to delete user", async () => {

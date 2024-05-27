@@ -1,7 +1,12 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-import { DELETED_USER_ID, createAccessToken } from "../testHelpers";
+import {
+    DELETED_USER_ID,
+    createAccessToken,
+    createUser,
+    userData,
+} from "../testHelpers";
 
 const api = supertest(app);
 describe("GET /users/:userId/posts", () => {
@@ -21,7 +26,11 @@ describe("GET /users/:userId/posts", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if auth token is missing", async () => {
-            await api.get(`/users/1/posts`).expect(401);
+            const savedUser = await createUser(userData);
+
+            const userId = savedUser._id.toString();
+
+            await api.get(`/users/${userId}/posts`).expect(401);
         });
         it("should return status 404 if user with given userId does not exist", async () => {
             const userId = DELETED_USER_ID;

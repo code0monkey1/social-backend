@@ -2,8 +2,7 @@ import createHttpError from "http-errors";
 import { UserRepository } from "../repositories/UserRepository";
 import { EncryptionService } from "./EncryptionService";
 import { PhotoType, UserType } from "../models/user.model";
-import fs from "fs";
-import logger from "../config/logger";
+import { PopulatedUser } from "../controllers/UserController";
 
 export class UserService {
     constructor(
@@ -11,36 +10,8 @@ export class UserService {
         private readonly userRepository: UserRepository,
     ) {}
 
-    async findByIdAndUpdateAvatar(
-        userId: string,
-        filePath: string,
-        contentType: string,
-    ) {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
-
-        user.avatar = {
-            data: filePath,
-            contentType,
-        } as unknown as PhotoType;
-
-        fs.unlink(filePath, (err) => {
-            if (err instanceof Error) {
-                logger.error(err);
-            }
-            throw createHttpError(400, "Invalid file type");
-        });
-
-        const savedUser = await user.save();
-
-        return savedUser;
+    async findById(id: string) {
+        return await this.userRepository.findById(id);
     }
 
     async createUser(name: string, email: string, password: string) {
@@ -56,16 +27,6 @@ export class UserService {
     }
 
     async deleteById(userId: string) {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
-
         await this.userRepository.deleteById(userId);
     }
 
@@ -76,26 +37,6 @@ export class UserService {
                 name: user.name,
             };
         });
-    }
-
-    async findById(userId: string) {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
-
-        await user?.populate("followers", "_id name");
-
-        await user?.populate("following", "_id name");
-
-        user.set("avatar", undefined);
-
-        return user;
     }
 
     async findByIdAndUpdate(
@@ -136,16 +77,6 @@ export class UserService {
     }
 
     async getUserAvatar(userId: string) {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
-
         const { avatar } = (await this.userRepository.findById(userId)) as {
             avatar: PhotoType;
         };
@@ -154,15 +85,6 @@ export class UserService {
     }
 
     async addFollowing(userId: string, followId: string) {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
         await this.userRepository.addFollowing(userId, followId);
     }
 
@@ -181,12 +103,6 @@ export class UserService {
     };
 
     removeFollowing = async (userId: string, followId: string) => {
-        const user = await this.userRepository.findById(userId);
-
-        if (!user) {
-            throw createHttpError(404, `User with id ${userId} not found`);
-        }
-
         await this.userRepository.removeFollowing(userId, followId);
     };
 
@@ -204,18 +120,10 @@ export class UserService {
         await followingUser.save();
     };
 
-    getRecommendations = async (userId: string) => {
-        const user = await this.userRepository.findById(userId);
+    getRecommendations = async (user: PopulatedUser) => {
+        const followingUsers = user.following?.map((f) => f.id) as string[];
 
-        if (!user) {
-            throw createHttpError(404, `User with id ${userId} not found`);
-        }
-
-        if (!user.following) {
-            user.following = [];
-        }
-
-        const followingUsers = user.following?.concat(userId);
+        followingUsers.push(user.id);
 
         const recommendedUsers =
             await this.userRepository.getUserRecommendations(followingUsers);

@@ -28,7 +28,7 @@ export class PostService {
         return await this.postRepository.comment(postId, comment);
     };
     uncomment = async (post: PostType, commentId: string, userId: string) => {
-        const comment = post?.comments.find(
+        const comment = post.comments.find(
             (comment) => comment._id.toString() === commentId,
         );
 
@@ -59,7 +59,7 @@ export class PostService {
             throw createHttpError(403, "user is unauthorized");
         }
 
-        return await this.postRepository.unlike(post, userId);
+        return await this.postRepository.unlike(post._id.toString(), userId);
     };
 
     photo = (post: PostType) => {

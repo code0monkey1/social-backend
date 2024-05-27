@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../services/UserService";
-import { UserType } from "../models/user.model";
+import { PhotoType, UserType } from "../models/user.model";
 import { TokenService } from "../services/TokenService";
 import fs from "fs";
 import { AuthRequest } from "./AuthController";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
+
 export class UserController {
     constructor(
         private readonly userService: UserService,
@@ -79,11 +80,28 @@ export class UserController {
         }
     };
 
-    findById = async (req: Request, res: Response, next: NextFunction) => {
+    findById = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        id: string,
+    ) => {
         try {
-            const user = await this.userService.findById(req.params.userId);
+            const user = await this.userService.findById(id);
 
-            res.status(200).json(user);
+            const _req = req as UserRequest;
+
+            if (!user) {
+                const error = createHttpError(
+                    404,
+                    `User with ${id} does not exist`,
+                );
+                throw error;
+            }
+
+            _req.user = user.toJSON();
+
+            next();
         } catch (error) {
             next(error);
         }
@@ -169,12 +187,11 @@ export class UserController {
         next: NextFunction,
     ) => {
         try {
-            const _req = req as AuthRequest;
+            const _req = req as UserRequest;
 
-            const { userId } = _req.auth;
-
-            const usersToFollow =
-                await this.userService.getRecommendations(userId);
+            const usersToFollow = await this.userService.getRecommendations(
+                _req.user,
+            );
 
             res.json(usersToFollow);
             res.json();
@@ -182,4 +199,18 @@ export class UserController {
             next(e);
         }
     };
+}
+
+export interface UserRequest extends Request {
+    user: PopulatedUser;
+}
+
+export interface PopulatedUser {
+    id: string;
+    name: string;
+    email: string;
+    about?: string;
+    avatar?: PhotoType;
+    followers?: { id: string; name: string }[];
+    following?: { id: string; name: string }[];
 }

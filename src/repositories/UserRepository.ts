@@ -14,7 +14,10 @@ export class UserRepository {
         return await User.findByIdAndDelete(userId);
     }
     public async findById(userId: string) {
-        return await User.findById(userId);
+        return await User.findById(userId)
+            .populate("following", "_id name")
+            .populate("followers", "_id name")
+            .exec();
     }
     public async findAll() {
         return await User.find();

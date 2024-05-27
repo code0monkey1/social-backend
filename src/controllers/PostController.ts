@@ -173,9 +173,10 @@ export class PostController {
         try {
             const _req = req as PostRequest;
 
-            const postWithPhoto = this.postService.photo(_req.post);
+            // set content type and data of image to response
+            res.set("Content-Type", _req.post?.photo?.contentType);
 
-            res.json(postWithPhoto);
+            res.send(_req.post?.photo?.data);
         } catch (e) {
             next(e);
         }

@@ -43,21 +43,21 @@ describe("GET /users/:userId/recommendations", () => {
 
             await addFollowing(user, followingUser);
 
-            expect(user.following?.map((f) => f.toString())).toContain(
-                followingUser._id.toString(),
-            );
+            expect(user.following).toContainEqual(followingUser._id);
+
             let userId = user._id.toString();
             const BASE_URL = getBaseUrl(userId);
+
             const response = await api
                 .get(`${BASE_URL}`)
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect("Content-Type", /json/)
                 .expect(200);
 
-            expect(response.body.map((u: any) => u.id)).not.toContain(
-                followingUser._id.toString(),
+            expect(response.body.map((u: any) => u.id)).not.toContainEqual(
+                followingUser.id.toString(),
             );
-            expect(response.body.map((u: any) => u.id)).toContain(
+            expect(response.body.map((u: any) => u.id)).toContainEqual(
                 anotherUser._id.toString(),
             );
             expect(response.body.length).toBe(1);
@@ -106,8 +106,10 @@ describe("GET /users/:userId/recommendations", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if no accessToken is provided", async () => {
-            let userId = 1;
+            const user = await createUser(userData);
+            let userId = user._id.toString();
             const BASE_URL = getBaseUrl(userId);
+
             await api.get(`${BASE_URL}`).expect(401);
         });
     });

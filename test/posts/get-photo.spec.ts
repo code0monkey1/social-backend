@@ -55,20 +55,16 @@ describe("GET  /posts/:postId/photo ", () => {
             const response = await api
                 .get(BASE_URL)
                 .set("Cookie", `accessToken=${accessToken}`)
+                .expect("Content-Type", photo.contentType)
                 .expect(200);
 
-            expect(response.body.photo.data).toBeDefined();
-            const responseBuffer = Buffer.from(
-                response.body.photo.data,
-                "base64",
-            );
+            expect(response.body).toBeDefined();
+            const responseBuffer = Buffer.from(response.body, "base64");
             const originalBuffer = Buffer.from(
                 photo.data.toString("base64"),
                 "base64",
             );
             expect(Buffer.compare(responseBuffer, originalBuffer)).toEqual(0);
-
-            expect(response.body.photo.contentType).toEqual(photo.contentType);
         });
 
         it("should null if no photo is present in the post ", async () => {
