@@ -67,7 +67,7 @@ export class AuthController {
                 newUser._id.toString(),
             );
 
-            res.status(201).json({ user: newUser });
+            res.status(201).json(newUser.id);
         } catch (e) {
             next(e);
         }
@@ -106,7 +106,7 @@ export class AuthController {
                 user?._id.toString(),
             );
 
-            res.status(200).json();
+            res.status(200).json(user.id);
         } catch (e) {
             next(e);
         }
@@ -116,12 +116,12 @@ export class AuthController {
         try {
             const { refreshTokenId, userId } = (req as AuthRequest).auth;
 
+            // remove refresh token from db
+
             await this.tokenService.deleteRefreshTokenOfUser(
                 refreshTokenId,
                 userId,
             );
-
-            // remove refresh token from db
 
             //remove refreshToken and accessToken from response cookies
             res.clearCookie("accessToken");

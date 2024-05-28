@@ -33,8 +33,8 @@ export class UserController {
         try {
             const posts = await this.userService.getPosts(req.params.userId);
             res.json(posts);
-        } catch (error) {
-            next(error);
+        } catch (e) {
+            next(e);
         }
     };
 
@@ -82,7 +82,7 @@ export class UserController {
 
     findById = async (
         req: Request,
-        res: Response,
+        _res: Response,
         next: NextFunction,
         id: string,
     ) => {
@@ -92,11 +92,7 @@ export class UserController {
             const _req = req as UserRequest;
 
             if (!user) {
-                const error = createHttpError(
-                    404,
-                    `User with ${id} does not exist`,
-                );
-                throw error;
+                throw createHttpError(404, `User with ${id} does not exist`);
             }
 
             _req.user = user.toJSON();

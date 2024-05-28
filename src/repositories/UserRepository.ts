@@ -15,12 +15,11 @@ export class UserRepository {
     }
     public async findById(userId: string) {
         return await User.findById(userId)
-            .populate("following", "_id name")
-            .populate("followers", "_id name")
-            .exec();
+            .populate("followers", "name _id")
+            .populate("following", "name _id");
     }
     public async findAll() {
-        return await User.find();
+        return await User.find().select("name _id");
     }
     public async getUserRecommendations(following: string[]) {
         return await User.find({ _id: { $nin: following } }).select("name _id");
