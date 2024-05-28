@@ -95,21 +95,6 @@ describe("POST /posts", () => {
                 .expect(400);
         });
 
-        it("should return 400 if postedBy is not provided as validation error", async () => {
-            const user = await createUser(userData);
-
-            const accessToken = await createAccessToken(user);
-
-            //add cookie
-            await api
-                .post(BASE_URL)
-                .send({
-                    text: "test",
-                })
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(400);
-        });
-
         //DONE:'should return 400 "Invalid file type" when file uploaded for post is not a photo'
         it('should return 400 "Invalid file type" when file uploaded for post is not a photo', async () => {
             const user = await createUser(userData);

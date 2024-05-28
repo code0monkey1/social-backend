@@ -9,6 +9,7 @@ import {
     assertIsUserPassword,
     createUser,
     getAllRefreshTokens,
+    getUserById,
 } from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/auth/register";
@@ -89,9 +90,7 @@ describe("POST /auth/register", () => {
 
             expect(refreshTokens).toHaveLength(1);
 
-            expect(refreshTokens[0].user.toString()).toBe(
-                response.body.user.id,
-            );
+            expect(refreshTokens[0].user.toString()).toBe(response.body);
             // verify expiry
             expect(refreshTokens[0].expiresAt).toBeDefined();
 

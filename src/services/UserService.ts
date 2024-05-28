@@ -31,12 +31,7 @@ export class UserService {
     }
 
     async findAll() {
-        const users = await this.userRepository.findAll();
-        return users.map((user: UserType) => {
-            return {
-                name: user.name,
-            };
-        });
+        return await this.userRepository.findAll();
     }
 
     async findByIdAndUpdate(
@@ -48,13 +43,6 @@ export class UserService {
             payload,
         );
 
-        if (!user) {
-            const error = createHttpError(
-                404,
-                `User with ${userId} does not exist`,
-            );
-            throw error;
-        }
         return user;
     }
 

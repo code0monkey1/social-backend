@@ -7,9 +7,26 @@ import fs from "fs";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
 import { PostRequest } from "../middleware/types";
+import { UserRequest } from "./UserController";
 
 export class PostController {
     constructor(private readonly postService: PostService) {}
+
+    getFeed = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as UserRequest;
+            const following = [] as string[];
+
+            _req.user?.following?.forEach((f) => {
+                following.push(f.id);
+            });
+
+            const posts = await this.postService.getFeed(following);
+            res.json(posts);
+        } catch (e) {
+            next(e);
+        }
+    };
 
     createPost = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -182,6 +199,18 @@ export class PostController {
         }
     };
 
+    getUserPosts = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as UserRequest;
+
+            const posts = await this.postService.findByUserId(_req.user.id);
+
+            res.json(posts);
+        } catch (e) {
+            next(e);
+        }
+    };
+
     getPostById = async (
         req: Request,
         _res: Response,
@@ -197,6 +226,7 @@ export class PostController {
 
             const _req = req as PostRequest;
             _req.post = post;
+
             next();
         } catch (e) {
             next(e);

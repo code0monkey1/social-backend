@@ -5,6 +5,9 @@ import { PostRepository } from "../repositories/PostRepository";
 export class PostService {
     constructor(private readonly postRepository: PostRepository) {}
 
+    getFeed = async (following: string[]) => {
+        return await this.postRepository.getFeed(following);
+    };
     createPost = async (postBody: Partial<PostType>) => {
         return await this.postRepository.cratePost(postBody);
     };
@@ -15,6 +18,10 @@ export class PostService {
 
     findByIdAndDelete = async (postId: string) => {
         return await this.postRepository.findByIdAndDelete(postId);
+    };
+
+    findByUserId = async (userId: string) => {
+        return await this.postRepository.findByUserId(userId);
     };
 
     findById = async (postId: string) => {

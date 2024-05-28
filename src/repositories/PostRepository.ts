@@ -1,6 +1,14 @@
 import Post, { CommentType, PostType } from "../models/post.model";
 
 export class PostRepository {
+    getFeed = async (following: string[]) => {
+        // get the posts of the people the user is following
+        return await Post.find({ postedBy: { $in: following } })
+            .populate("postedBy", "_id name")
+            .populate("comments.postedBy", "_id name")
+            .populate("likes", "_id name")
+            .sort("-createdAt");
+    };
     cratePost = async (postBody: Partial<PostType>) => {
         return await Post.create(postBody);
     };
@@ -8,7 +16,13 @@ export class PostRepository {
     updatePost = async (postId: string, postBody: Partial<PostType>) => {
         return await Post.findByIdAndUpdate(postId, postBody, { new: true });
     };
-
+    findByUserId = async (userId: string) => {
+        return await Post.find({ postedBy: userId })
+            .populate("postedBy", "_id name")
+            .populate("comments.postedBy", "_id name")
+            .populate("likes", "_id name")
+            .sort("-createdAt");
+    };
     findById = async (postId: string) => {
         return await Post.findById(postId);
     };
