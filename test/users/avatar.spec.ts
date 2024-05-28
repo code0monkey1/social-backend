@@ -9,8 +9,12 @@ import {
     updateUserAvatar,
     userData,
 } from "../testHelpers";
+
 const api = supertest(app);
-const BASE_URL = "/self/avatar";
+
+const getBaseUrl = (userId: string) => {
+    return `/users/${userId}/avatar`;
+};
 
 describe("GET /self/avatar", () => {
     beforeAll(async () => {
@@ -32,7 +36,7 @@ describe("GET /self/avatar", () => {
 
             const { defaultImageBuffer, defaultImageType } =
                 getDefaultProfileImageAndType();
-
+            const BASE_URL = getBaseUrl(savedUser._id.toString());
             // the content type should be image/png
             const response = await api
                 .get(BASE_URL)
@@ -57,7 +61,7 @@ describe("GET /self/avatar", () => {
             };
 
             await updateUserAvatar(savedUser._id.toString(), avatar);
-
+            const BASE_URL = getBaseUrl(savedUser._id.toString());
             // the content type should be image/png
             const response = await api
                 .get(BASE_URL)
@@ -71,6 +75,10 @@ describe("GET /self/avatar", () => {
 
     describe("unhappy path", () => {
         it("should return 401 if no accessToken is provided", async () => {
+            const savedUser = await createUser(userData);
+
+            const BASE_URL = getBaseUrl(savedUser._id.toString());
+
             await api.get(BASE_URL).expect(401);
         });
 
@@ -79,7 +87,7 @@ describe("GET /self/avatar", () => {
             const accessToken = await createAccessToken(savedUser);
 
             await deleteUser(savedUser._id.toString());
-
+            const BASE_URL = getBaseUrl(savedUser._id.toString());
             await api
                 .get(BASE_URL)
                 .set("Cookie", [`accessToken=${accessToken}`])

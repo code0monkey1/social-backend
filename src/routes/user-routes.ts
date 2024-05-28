@@ -54,6 +54,13 @@ router.get(
     userController.recommendations,
 );
 
+router.get(
+    "/:userId/avatar",
+    authenticate,
+    userController.avatar,
+    userController.defaultAvatar,
+);
+
 // user posts
 
 router.get("/:userId/posts", authenticate, userController.getPosts);

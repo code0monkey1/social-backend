@@ -9,11 +9,4 @@ const selfController = makeSelfController();
 
 router.get("/", authenticate, selfController.self);
 
-router.get(
-    "/avatar",
-    authenticate,
-    selfController.avatar,
-    selfController.defaultAvatar,
-);
-
 export default router;

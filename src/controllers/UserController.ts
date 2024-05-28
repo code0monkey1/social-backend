@@ -6,6 +6,7 @@ import fs from "fs";
 import { AuthRequest } from "./AuthController";
 import logger from "../config/logger";
 import createHttpError from "http-errors";
+import getDefaultProfileImageAndType from "../helpers";
 
 export class UserController {
     constructor(
@@ -172,6 +173,34 @@ export class UserController {
             await this.userService.removeFollower(userId, followingId);
 
             res.json();
+        } catch (e) {
+            next(e);
+        }
+    };
+
+    avatar = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const _req = req as UserRequest;
+
+            const avatar = await this.userService.getUserAvatar(_req.user.id);
+
+            if (!avatar?.data) {
+                return next();
+            }
+            res.set("Content-Type", avatar.contentType);
+            res.json(avatar.data);
+        } catch (e) {
+            next(e);
+        }
+    };
+    defaultAvatar = (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { defaultImageBuffer, defaultImageType } =
+                getDefaultProfileImageAndType();
+
+            res.set("Content-Type", defaultImageType);
+
+            res.send(defaultImageBuffer);
         } catch (e) {
             next(e);
         }

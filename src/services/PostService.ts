@@ -68,11 +68,4 @@ export class PostService {
 
         return await this.postRepository.unlike(post._id.toString(), userId);
     };
-
-    photo = (post: PostType) => {
-        if (post.photo?.data) {
-            post.photo;
-        }
-        return post;
-    };
 }
