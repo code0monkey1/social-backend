@@ -30,15 +30,6 @@ export class UserController {
         }
     };
 
-    getPosts = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const posts = await this.userService.getPosts(req.params.userId);
-            res.json(posts);
-        } catch (e) {
-            next(e);
-        }
-    };
-
     addFollower = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const _req = req as AuthRequest;

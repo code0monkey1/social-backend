@@ -54,16 +54,14 @@ router.get(
     userController.recommendations,
 );
 
+// user avatar route
+
 router.get(
     "/:userId/avatar",
     authenticate,
     userController.avatar,
     userController.defaultAvatar,
 );
-
-// user posts
-
-router.get("/:userId/posts", authenticate, userController.getPosts);
 
 // common middleware triggered at the start of all userId routes
 
