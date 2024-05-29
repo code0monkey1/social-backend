@@ -2,10 +2,12 @@
     "name": "template",
     "version": "1.0.0",
     "description": "generic template for creating nodejs project using typescript",
-    "main": "index.js",
+    "main": "dist/server.js",
     "scripts": {
         "dev": "nodemon src/server.ts",
+        "start": "node dist/server.js",
         "test": "node --no-warnings --experimental-vm-modules node_modules/.bin/jest --watchAll --runInBand ",
+        "build": "tsc",
         "format:check": "prettier . --check",
         "format:fix": "prettier . --write",
         "test:prod": "jest --runInBand",
