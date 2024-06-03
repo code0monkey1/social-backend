@@ -9,7 +9,6 @@ import {
     assertIsUserPassword,
     createUser,
     getAllRefreshTokens,
-    getUserById,
 } from "../testHelpers";
 const api = supertest(app);
 const BASE_URL = "/auth/register";

@@ -13,6 +13,10 @@ const authController = makeAuthController();
 
 router.post("/register", registerValidator, authController.register);
 
+// guest route
+
+router.post("/register/guest", authController.register_guest);
+
 router.post("/login", loginValidator, authController.login);
 
 router.post("/logout", authenticate, parseRefreshToken, authController.logout);

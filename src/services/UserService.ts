@@ -1,9 +1,9 @@
 import createHttpError from "http-errors";
 import { UserRepository } from "../repositories/UserRepository";
 import { EncryptionService } from "./EncryptionService";
-import { PhotoType, UserType } from "../models/user.model";
+import { PhotoType, UserRoles, UserType } from "../models/user.model";
 import { PopulatedUser } from "../controllers/UserController";
-
+import { randomBytes } from "crypto";
 export class UserService {
     constructor(
         private readonly encryptionService: EncryptionService,
@@ -14,13 +14,19 @@ export class UserService {
         return await this.userRepository.findById(id);
     }
 
-    async createUser(name: string, email: string, password: string) {
+    async createUser(
+        name: string,
+        email: string,
+        password: string,
+        isGuest = false,
+    ) {
         const hashedPassword = await this.encryptionService.hash(password);
 
         const user = await this.userRepository.create({
             name,
             email,
             hashedPassword,
+            role: isGuest ? UserRoles.GUEST : UserRoles.USER,
         });
 
         return user;
@@ -45,7 +51,13 @@ export class UserService {
 
         return user;
     }
+    getGuestDetails() {
+        const guest_name = randomBytes(4).toString("hex");
+        const guest_email = `${guest_name}@guest_email.com`;
+        const guest_password = guest_name;
 
+        return { guest_name, guest_email, guest_password };
+    }
     async findByEmailAndPassword(email: string, password: string) {
         const user = await this.userRepository.findByEmail(email);
 

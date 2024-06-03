@@ -6,6 +6,11 @@ export interface PhotoType {
     contentType: string;
 }
 
+export const enum UserRoles {
+    USER = "user",
+    GUEST = "guest",
+}
+
 export interface UserType {
     name: string;
     email: string;
@@ -14,6 +19,7 @@ export interface UserType {
     avatar?: PhotoType;
     followers?: string[];
     following?: string[];
+    role: UserRoles;
 }
 // the file is 1 directory up in pics with the name profile-default.svg
 
@@ -32,7 +38,7 @@ const UserSchema = new Schema<UserType>(
         },
         hashedPassword: {
             type: String,
-            required: [true, "Password is required"],
+            required: [true, "hashedPassword is required"],
         },
         about: {
             type: String,
@@ -42,6 +48,10 @@ const UserSchema = new Schema<UserType>(
         avatar: {
             data: Buffer,
             contentType: String,
+        },
+        role: {
+            type: String,
+            default: UserRoles.USER,
         },
         followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
         following: [{ type: Schema.Types.ObjectId, ref: "User" }],

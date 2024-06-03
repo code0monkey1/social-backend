@@ -1,6 +1,6 @@
 {
     "CodeGPT.apiKey": "CodeGPT Plus Beta",
-    "cSpell.words": ["unfollow", "unfollowed"],
+    "cSpell.words": ["unfollow", "unfollowed", "uuidv"],
     "jest.runMode": {
         "type": "on-save",
         "deferred": true

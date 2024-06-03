@@ -27,6 +27,48 @@ export class AuthController {
         }
     };
 
+    register_guest = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            const { guest_name, guest_email, guest_password } =
+                this.userService.getGuestDetails();
+
+            const user = await User.findOne({ guest_email });
+
+            if (user) {
+                const error = createHttpError(400, "User already exists");
+                throw error;
+            }
+
+            // create a new user
+            const newUser = await this.userService.createUser(
+                guest_name,
+                guest_email,
+                guest_password,
+                true,
+            );
+
+            // set access cookie
+            this.tokenService.setAccessToken(res, {
+                userId: newUser._id.toString(),
+            });
+
+            // set refresh cookie
+            await this.tokenService.setRefreshToken(
+                res,
+                { userId: newUser._id.toString() },
+                newUser._id.toString(),
+            );
+
+            res.status(201).json(newUser._id);
+        } catch (e) {
+            next(e);
+        }
+    };
+
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name, email, password } = req.body as Request & {

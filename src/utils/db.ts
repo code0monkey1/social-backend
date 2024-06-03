@@ -19,7 +19,7 @@ export const db = {
                 Config.NODE_ENV === "test" ? mockDbUrl : Config.MONGODB_URI!,
             );
 
-            logger.info("✅ MongoDb connected!");
+            logger.info("✅ MongoDb connected!", Config.MONGODB_URI!);
         } catch (error) {
             logger.error("❌ Error connecting to MongoDB", error);
         }
