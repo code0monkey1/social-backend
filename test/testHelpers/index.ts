@@ -103,10 +103,12 @@ export const DELETED_USER_ID = "6647ba93ab53630b4aa7ee38";
 export async function createRefreshToken(
     userId: string,
     refreshTokenId?: string,
+    isGuest = false,
 ) {
     const refreshTokenEntry = await refreshTokenRepository.createRefreshToken({
         user: userId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        isGuest,
     });
 
     const refreshToken = jwt.sign(
@@ -122,10 +124,11 @@ export async function createRefreshToken(
     return refreshToken;
 }
 
-export async function persistRefreshToken(userId: string) {
+export async function persistRefreshToken(userId: string, isGuest = false) {
     return await refreshTokenRepository.createRefreshToken({
         user: userId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        isGuest,
     });
 }
 

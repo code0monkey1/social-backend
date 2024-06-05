@@ -15,11 +15,11 @@ export interface UserType {
     name: string;
     email: string;
     hashedPassword: string;
+    role: UserRoles;
     about?: string;
     avatar?: PhotoType;
     followers?: string[];
     following?: string[];
-    role: UserRoles;
 }
 // the file is 1 directory up in pics with the name profile-default.svg
 
@@ -53,11 +53,20 @@ const UserSchema = new Schema<UserType>(
             type: String,
             default: UserRoles.USER,
         },
+
         followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
         following: [{ type: Schema.Types.ObjectId, ref: "User" }],
     },
     {
         timestamps: true,
+    },
+);
+
+UserSchema.index(
+    { createdAt: 1 },
+    {
+        expireAfterSeconds: 60 * 60 * 24,
+        partialFilterExpression: { role: UserRoles.GUEST },
     },
 );
 

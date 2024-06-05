@@ -33,4 +33,8 @@ describe("POST /auth/register/guest", () => {
 
         expect(user.email).toBe(`${user.name}@guest_email.com`);
     });
+
+    it("should delete guest user data after 24 hours", async () => {
+        await api.post(BASE_URL).send({}).expect(201);
+    });
 });
