@@ -21,7 +21,6 @@ export interface UserType {
     followers?: string[];
     following?: string[];
 }
-// the file is 1 directory up in pics with the name profile-default.svg
 
 const UserSchema = new Schema<UserType>(
     {
@@ -49,6 +48,7 @@ const UserSchema = new Schema<UserType>(
             data: Buffer,
             contentType: String,
         },
+
         role: {
             type: String,
             default: UserRoles.USER,
@@ -59,6 +59,7 @@ const UserSchema = new Schema<UserType>(
     },
     {
         timestamps: true,
+        collection: "users",
     },
 );
 
@@ -72,7 +73,6 @@ UserSchema.index(
 
 // delete the __v and the _id fields from the response object
 UserSchema.set("toJSON", {
-    versionKey: false,
     transform: function (doc, ret) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         ret.id = ret._id.toString();

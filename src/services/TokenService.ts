@@ -20,10 +20,15 @@ export class TokenService {
         });
     }
 
-    async setRefreshToken(res: Response, jwtPayload: JwtPayload, user: string) {
+    async setRefreshToken(
+        res: Response,
+        jwtPayload: JwtPayload,
+        user: string,
+        isGuest = false,
+    ) {
         //persist jwt  , should have user and expiry time
 
-        const savedRefreshToken = await this.persistRefreshToken(user);
+        const savedRefreshToken = await this.persistRefreshToken(user, isGuest);
 
         const refreshToken = this.generateRefreshToken(
             jwtPayload,

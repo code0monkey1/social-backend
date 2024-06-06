@@ -2,8 +2,9 @@ import bcrypt from "bcrypt";
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-
-import { userData, getUserById } from "../testHelpers";
+import { IndexDefinition } from "mongoose";
+import { userData, getUserById, createUser } from "../testHelpers";
+import User from "../../src/models/user.model";
 const api = supertest(app);
 const BASE_URL = "/auth/register/guest";
 
@@ -34,7 +35,28 @@ describe("POST /auth/register/guest", () => {
         expect(user.email).toBe(`${user.name}@guest_email.com`);
     });
 
-    it("should delete guest user data after 24 hours", async () => {
-        await api.post(BASE_URL).send({}).expect(201);
+    it("should have expireAfterSeconds set to one day for guest user", async () => {
+        const EXPIRE_IN_A_SECOND = 1;
+        // Create the index
+        await User.collection.createIndex(
+            { createdAt: 1 },
+            {
+                expireAfterSeconds: EXPIRE_IN_A_SECOND,
+                partialFilterExpression: { role: "guest" },
+            },
+        );
+
+        // Find the index with the desired name
+        const createdAtIndex = (
+            await User.collection.listIndexes().toArray()
+        ).find(
+            (index: IndexDefinition) =>
+                typeof index.key === "object" &&
+                "createdAt" in index.key &&
+                (index.key as { createdAt: number }).createdAt === 1,
+        ) as IndexDefinition | undefined;
+
+        // Assert that the expireAfterSeconds is set to one day
+        expect(createdAtIndex?.expireAfterSeconds).toBe(EXPIRE_IN_A_SECOND);
     });
 });

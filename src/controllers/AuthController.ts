@@ -28,7 +28,7 @@ export class AuthController {
     };
 
     register_guest = async (
-        req: Request,
+        _req: Request,
         res: Response,
         next: NextFunction,
     ) => {
@@ -61,6 +61,7 @@ export class AuthController {
                 res,
                 { userId: newUser._id.toString() },
                 newUser._id.toString(),
+                true,
             );
 
             res.status(201).json(newUser._id);
