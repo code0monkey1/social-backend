@@ -60,7 +60,7 @@ export class AuthController {
                 name,
                 email,
                 password,
-                role === UserRoles.GUEST,
+                role || UserRoles.USER,
             );
 
             // set access cookie

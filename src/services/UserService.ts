@@ -18,7 +18,7 @@ export class UserService {
         name: string,
         email: string,
         password: string,
-        isGuest = false,
+        role: UserRoles,
     ) {
         const hashedPassword = await this.encryptionService.hash(password);
 
@@ -26,7 +26,7 @@ export class UserService {
             name,
             email,
             hashedPassword,
-            role: isGuest ? UserRoles.GUEST : UserRoles.USER,
+            role,
         });
 
         return user;
