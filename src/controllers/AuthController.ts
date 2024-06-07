@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../models/user.model";
+import User, { UserRoles } from "../models/user.model";
 import createHttpError from "http-errors";
 import { TokenService } from "../services/TokenService";
 import { UserService } from "../services/UserService";
@@ -27,68 +27,32 @@ export class AuthController {
         }
     };
 
-    register_guest = async (
-        _req: Request,
-        res: Response,
-        next: NextFunction,
-    ) => {
-        try {
-            const { guest_name, guest_email, guest_password } =
-                this.userService.getGuestDetails();
-
-            const user = await User.findOne({ guest_email });
-
-            if (user) {
-                const error = createHttpError(400, "User already exists");
-                throw error;
-            }
-
-            // create a new user
-            const newUser = await this.userService.createUser(
-                guest_name,
-                guest_email,
-                guest_password,
-                true,
-            );
-
-            // set access cookie
-            this.tokenService.setAccessToken(res, {
-                userId: newUser._id.toString(),
-            });
-
-            // set refresh cookie
-            await this.tokenService.setRefreshToken(
-                res,
-                { userId: newUser._id.toString() },
-                newUser._id.toString(),
-                true,
-            );
-
-            res.status(201).json(newUser._id);
-        } catch (e) {
-            next(e);
-        }
-    };
-
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { name, email, password } = req.body as Request & {
-                name: string;
-                email: string;
-                password: string;
-            };
+            let { name, email, password } = req.body as UserData;
 
-            const result = validationResult(req);
+            const { role } = req.body as UserData;
 
-            if (!result.isEmpty()) {
-                return res.status(400).json({ errors: result.array() });
-            }
+            if (role === UserRoles.GUEST) {
+                const { guest_name, guest_email, guest_password } =
+                    this.userService.getGuestDetails();
 
-            const user = await User.findOne({ email });
+                name = guest_name;
+                email = guest_email;
+                password = guest_password;
+            } else {
+                const result = validationResult(req);
 
-            if (user) {
-                const error = createHttpError(400, "User already exists");
-                throw error;
+                if (!result.isEmpty()) {
+                    return res.status(400).json({ errors: result.array() });
+                }
+
+                const user = await User.findOne({ email });
+
+                if (user) {
+                    const error = createHttpError(400, "User already exists");
+                    throw error;
+                }
             }
 
             // create a new user
@@ -96,6 +60,7 @@ export class AuthController {
                 name,
                 email,
                 password,
+                role === UserRoles.GUEST,
             );
 
             // set access cookie
@@ -103,11 +68,12 @@ export class AuthController {
                 userId: newUser._id.toString(),
             });
 
-            // set refresh cookie
+            // set refresh cookie , guest refreshToken will expire after 1 day
             await this.tokenService.setRefreshToken(
                 res,
                 { userId: newUser._id.toString() },
                 newUser._id.toString(),
+                role === UserRoles.GUEST,
             );
 
             res.status(201).json(newUser.id);
@@ -120,10 +86,7 @@ export class AuthController {
         // set cookies
 
         try {
-            const { email, password } = req.body as Request & {
-                email: string;
-                password: string;
-            };
+            const { email, password } = req.body as UserData;
 
             const result = validationResult(req);
 
@@ -240,4 +203,5 @@ export interface UserData {
     name: string;
     email: string;
     password: string;
+    role: UserRoles;
 }
