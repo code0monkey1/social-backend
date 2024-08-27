@@ -1,4 +1,4 @@
-import { hash } from "bcrypt";
+import { hash } from "bcryptjs";
 import supertest from "supertest";
 import app from "../../src/app";
 import { UserRepository } from "../../src/repositories/UserRepository";

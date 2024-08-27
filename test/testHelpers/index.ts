@@ -1,7 +1,7 @@
 import { UserRepository } from "../../src/repositories/UserRepository";
 const userRepository = new UserRepository();
 import jwt from "jsonwebtoken";
-import { hash, compare } from "bcrypt";
+import { hash, compare } from "bcryptjs";
 import { Config } from "../../src/config";
 import { RefreshTokenRepository } from "../../src/repositories/RefreshTokenRepository";
 import RefreshToken from "../../src/models/refresh.token.model";

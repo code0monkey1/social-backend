@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { db } from "../../src/utils/db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import {
     getAllUsers,
     userData,
