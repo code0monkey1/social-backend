@@ -107,17 +107,17 @@ export class UserService {
     };
 
     removeFollower = async (userId: string, followId: string) => {
-        const followingUser = await this.userRepository.findById(followId);
+        const userBeingFollowed = await this.userRepository.findById(followId);
 
-        if (!followingUser) {
+        if (!userBeingFollowed) {
             throw createHttpError(404, `User with id ${followId} not found`);
         }
 
-        followingUser.followers = followingUser.followers?.filter(
+        userBeingFollowed.followers = userBeingFollowed.followers?.filter(
             (f) => f != userId,
         );
 
-        await followingUser.save();
+        await userBeingFollowed.save();
     };
 
     getRecommendations = async (user: PopulatedUser) => {
