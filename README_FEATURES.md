@@ -8,4 +8,4 @@
 -   [x] Listing posts by user
 -   [x] Liking posts
 -   [x] Commenting on posts
--   [ ] Guest Route
+-   [x] Guest Route
