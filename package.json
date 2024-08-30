@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "nodemon src/server.ts",
         "start": "node dist/server.js",
-        "test": "node  --no-warnings --experimental-vm-modules node_modules/.bin/jest --watchAll --runInBand ",
+        "test": "node --no-warnings --experimental-vm-modules node_modules/.bin/jest --no-cache --coverage --all --runInBand ",
         "build": "tsc",
         "format:check": "prettier . --check",
         "format:fix": "prettier . --write",
