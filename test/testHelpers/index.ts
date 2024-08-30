@@ -9,8 +9,12 @@ import User, { UserType } from "../../src/models/user.model";
 const refreshTokenRepository = new RefreshTokenRepository();
 import Post, { PostType } from "../../src/models/post.model";
 export async function createUser(user: any) {
-    return userRepository.create({
+    const uniqueUserData = {
         ...user,
+        name: `${user.name}_${Date.now()}`, // Append timestamp for uniqueness
+    };
+    return userRepository.create({
+        ...uniqueUserData,
         hashedPassword: await hash(user.password, 10),
     });
 }
