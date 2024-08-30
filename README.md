@@ -43,3 +43,9 @@ Feel free to dive deeper into the project, explore the codebase and the related 
 ## Self Routes
 
 1. **/self**: Fetches information about the logged-in user.
+
+---
+
+## CI Pipeline:
+
+Ci/Cd pipeline added using github actions
