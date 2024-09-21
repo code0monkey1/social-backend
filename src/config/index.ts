@@ -8,6 +8,7 @@ const {
     JWT_SECRET,
     JWT_EXPIRATION_TIME,
     MONGODB_URI_TEST,
+    CLIENT_URL,
 } = process.env;
 
 export const Config = {
@@ -17,4 +18,5 @@ export const Config = {
     MONGODB_URI_TEST,
     JWT_SECRET,
     JWT_EXPIRATION_TIME,
+    CLIENT_URL,
 };
