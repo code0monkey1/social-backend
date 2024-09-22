@@ -5,6 +5,7 @@ import { TokenService } from "../services/TokenService";
 import { UserService } from "../services/UserService";
 import { validationResult } from "express-validator";
 import { Logger } from "winston";
+
 export class AuthController {
     constructor(
         private readonly tokenService: TokenService,

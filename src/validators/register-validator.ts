@@ -19,7 +19,7 @@ export default checkSchema({
         },
     },
     name: {
-        errorMessage: "lastName is missing",
+        errorMessage: "name is missing",
         notEmpty: true,
     },
 });
