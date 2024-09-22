@@ -3,20 +3,31 @@ import createHttpError from "http-errors";
 import { UserService } from "../services/UserService";
 import getDefaultProfileImageAndType from "../helpers";
 import { AuthRequest } from "./AuthController";
+import { Logger } from "winston";
 
 export class SelfController {
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly logger: Logger,
+    ) {}
 
     self = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // get userId from cookie
             const { userId } = (req as AuthRequest).auth;
 
+            this.logger.info(
+                `User with id ${userId} is trying to get his data`,
+            );
+
             const user = await this.userService.findById(userId);
 
             if (!user) {
+                this.logger.error(`User with id ${userId} not found`);
                 throw createHttpError(404, "User not found");
             }
+
+            this.logger.info(`User with id ${userId} found`);
 
             res.json(user);
         } catch (error) {

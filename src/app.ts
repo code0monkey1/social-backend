@@ -6,17 +6,23 @@ import authRouter from "./routes/auth-routes";
 import userRouter from "./routes/user-routes";
 import selfRouter from "./routes/self-routes";
 import postRouter from "./routes/post-routes";
-import cookieParse from "cookie-parser";
+import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import { Config } from "./config";
 const app = express();
 
-const cookieParser = cookieParse();
-
 app.use(express.json());
 
-app.use(cookieParser);
+app.use(cookieParser());
+
+app.use(
+    cors({
+        origin: [Config.CLIENT_URL!],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    }),
+);
 
 app.use("/auth", authRouter);
 
@@ -26,15 +32,7 @@ app.use("/self", selfRouter);
 
 app.use("/posts", postRouter);
 
-app.use(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    cors({
-        origin: Config.CLIENT_URL,
-        credentials: true,
-
-        //access-control-allow-credentials:true
-    }),
-);
+logger.info(`The client url is ${Config.CLIENT_URL}✅`);
 
 app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
