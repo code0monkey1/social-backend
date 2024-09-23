@@ -9,7 +9,11 @@ export class TokenService {
     ) {}
 
     setAccessToken(res: Response, jwtPayload: JwtPayload) {
-        const token = this.jwtService.generate(jwtPayload);
+        const token = this.jwtService.generate(jwtPayload, {
+            expiresIn: "1m",
+            jwtId: "accessToken",
+            issuer: "base-backend",
+        });
 
         // return the jwt in the cookie
         res.cookie("accessToken", token, {
