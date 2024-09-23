@@ -14,6 +14,7 @@ export default expressjwt({
 
         return refreshToken;
     },
+
     async isRevoked(_req: Request, token) {
         try {
             // see if the refreshToken with given Id is present

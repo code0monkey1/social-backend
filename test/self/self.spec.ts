@@ -63,5 +63,16 @@ describe("GET /self", () => {
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(401);
         });
+
+        it("should return 401 if accessToken is expired", async () => {
+            const createdUser = await createUser(userData);
+            const accessToken = await createAccessToken(createdUser, 1);
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await api
+                .get(BASE_URL)
+                .set("Cookie", [`accessToken=${accessToken}`])
+                .expect(401);
+        });
     });
 });

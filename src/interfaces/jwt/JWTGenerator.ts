@@ -11,5 +11,5 @@ export interface JWTGeneratorOptions {
 }
 
 export interface JWTGenerator {
-    generate(payload: JwtPayload, jwtOptions?: JWTGeneratorOptions): string;
+    generate(payload: JwtPayload, jwtOptions: JWTGeneratorOptions): string;
 }

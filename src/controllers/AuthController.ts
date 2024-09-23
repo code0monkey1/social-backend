@@ -171,6 +171,7 @@ export class AuthController {
             //create new accessToken
 
             this.tokenService.setAccessToken(res, jwtPayload);
+
             await this.tokenService.setRefreshToken(
                 res,
                 jwtPayload,
