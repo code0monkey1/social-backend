@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-config();
+config(); // for loading .env values
 
 const {
     PORT,

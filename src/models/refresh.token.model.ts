@@ -18,7 +18,7 @@ const RefreshTokenSchema = new Schema(
 RefreshTokenSchema.index(
     { createdAt: 1 },
     {
-        expireAfterSeconds: 60 * 60 * 24,
+        expireAfterSeconds: 60 * 60 * 24, // expires in a day
         partialFilterExpression: { isGuest: true },
     },
 );
