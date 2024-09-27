@@ -1,6 +1,6 @@
 import supertest from "supertest";
-import app from "../../src/app";
-import { db } from "../../src/utils/db";
+import app from "../../../src/app";
+import { db } from "../../../src/utils/db";
 import {
     DELETED_USER_ID,
     addFollowing,
@@ -8,7 +8,7 @@ import {
     createPost,
     createUser,
     userData,
-} from "../testHelpers";
+} from "../../testHelpers";
 
 const api = supertest(app);
 const BASE_URL = `/posts/feed/user`;
@@ -50,11 +50,9 @@ describe("GET /posts/feed/user/:userId", () => {
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .expect(200);
 
-            expect(response.body[0].id.toString()).toBe(
-                savedPost._id.toString(),
-            );
+            expect(response.body.posts[0].id).toEqual(savedPost._id.toString());
 
-            expect(response.body.length).toBe(1);
+            expect(response.body.posts.length).toBe(1);
         });
     });
 

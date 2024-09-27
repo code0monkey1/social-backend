@@ -10,7 +10,7 @@ export class TokenService {
 
     setAccessToken(res: Response, jwtPayload: JwtPayload) {
         const token = this.jwtService.generate(jwtPayload, {
-            expiresIn: "1m",
+            expiresIn: "1h",
             jwtId: "accessToken",
             issuer: "base-backend",
         });

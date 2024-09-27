@@ -1,3 +1,4 @@
+import { postOptions } from "../config/pagination";
 import Post, { CommentType, PostType } from "../models/post.model";
 
 export class PostRepository {
@@ -7,7 +8,8 @@ export class PostRepository {
             .populate("postedBy", "_id name")
             .populate("comments.postedBy", "_id name")
             .populate("likes", "_id name")
-            .sort("-createdAt");
+            .sort("-createdAt")
+            .paginate(postOptions);
     };
     cratePost = async (postBody: Partial<PostType>) => {
         return await Post.create(postBody);

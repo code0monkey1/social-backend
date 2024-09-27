@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Schema, model } from "mongoose";
+import { PaginateModel, Schema, model, Document } from "mongoose";
+import paginate from "mongoose-paginate-v2";
+import { postOptions } from "../config/pagination";
 
 export interface PhotoType {
     data: Buffer;
@@ -13,7 +15,7 @@ export interface CommentType {
     _id: string;
 }
 
-export interface PostType {
+export interface PostType extends Document {
     _id: string;
     postedBy: string;
     text: string;
@@ -62,6 +64,9 @@ const PostSchema = new Schema<PostType>(
     },
 );
 
+// paginate with this plugin
+PostSchema.plugin(paginate);
+
 // delete the __v and the _id fields from the response object
 PostSchema.set("toJSON", {
     versionKey: false,
@@ -72,6 +77,13 @@ PostSchema.set("toJSON", {
         delete ret.__v;
     },
 });
-const Post = model<PostType>("Post", PostSchema);
+
+const Post = model<PostType, PaginateModel<PostType>>(
+    "Post",
+    PostSchema,
+    "post",
+);
+
+void Post.paginate({}, postOptions);
 
 export default Post;
