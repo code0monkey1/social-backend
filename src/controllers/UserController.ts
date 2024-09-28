@@ -210,7 +210,6 @@ export class UserController {
             );
 
             res.json(usersToFollow);
-            res.json();
         } catch (e) {
             next(e);
         }
