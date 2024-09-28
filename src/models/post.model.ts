@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PaginateModel, Schema, model, Document } from "mongoose";
 import paginate from "mongoose-paginate-v2";
-import { postOptions } from "../config/pagination";
 
 export interface PhotoType {
     data: Buffer;
@@ -83,7 +82,5 @@ const Post = model<PostType, PaginateModel<PostType>>(
     PostSchema,
     "post",
 );
-
-void Post.paginate({}, postOptions);
 
 export default Post;
