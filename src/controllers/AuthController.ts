@@ -36,6 +36,7 @@ export class AuthController {
 
             const { role } = req.body as UserData;
 
+            // if it's a guest, store default guest information
             if (role === UserRoles.GUEST) {
                 const { guest_name, guest_email, guest_password } =
                     this.userService.getGuestDetails();
@@ -71,7 +72,8 @@ export class AuthController {
                 userId: newUser._id.toString(),
             });
 
-            // set refresh cookie , guest refreshToken will expire after 1 day
+            // set refresh cookie to the header
+            // The guest refreshToken will expire after 1 day
             await this.tokenService.setRefreshToken(
                 res,
                 { userId: newUser._id.toString() },
@@ -130,7 +132,6 @@ export class AuthController {
             const { refreshTokenId, userId } = (req as AuthRequest).auth;
 
             // remove refresh token from db
-
             await this.tokenService.deleteRefreshTokenOfUser(
                 refreshTokenId,
                 userId,
@@ -145,7 +146,9 @@ export class AuthController {
             next(e);
         }
     };
-
+    /*
+   This endpoint is used to create a new refresh token which is used to 
+   */
     refresh = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // delete previous refresh token
@@ -169,7 +172,6 @@ export class AuthController {
             };
 
             //create new accessToken
-
             this.tokenService.setAccessToken(res, jwtPayload);
 
             await this.tokenService.setRefreshToken(

@@ -66,6 +66,7 @@ const UserSchema = new Schema<UserType>(
 UserSchema.index(
     { createdAt: 1 },
     {
+        // 1 day expiry time for users with roles 'Guest'
         expireAfterSeconds: 60 * 60 * 24,
         partialFilterExpression: { role: UserRoles.GUEST },
     },
