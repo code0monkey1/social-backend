@@ -31,7 +31,6 @@ export class TokenService {
         isGuest = false,
     ) {
         //persist jwt  , should have user and expiry time
-
         const savedRefreshToken = await this.persistRefreshToken(user, isGuest);
 
         const refreshToken = this.generateRefreshToken(

@@ -58,7 +58,6 @@ export class UserController {
     deleteById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // delete user by id
-
             await this.userService.deleteById(req.params.userId);
 
             // delete all refreshTokens of user

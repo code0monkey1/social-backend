@@ -4,6 +4,8 @@ import { validateMIMEType } from "validate-image-type";
 import fs from "fs";
 import logger from "../config/logger";
 
+import { FileRequest, ValidationResult } from "./types";
+
 export const parseImage = async (
     req: Request,
     _res: Response,
@@ -26,8 +28,8 @@ export const parseImage = async (
             ],
         })) as ValidationResult;
 
+        //delete if picture is of incorrect format
         if (!result.ok) {
-            //delete file:
             fs.unlink(_req.file.path, (err) => {
                 if (err instanceof Error) {
                     logger.error(err);
@@ -43,10 +45,3 @@ export const parseImage = async (
         next(e);
     }
 };
-
-export interface FileRequest extends Request {
-    file: Express.Multer.File;
-}
-export interface ValidationResult {
-    ok: boolean;
-}
