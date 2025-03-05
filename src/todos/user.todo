@@ -1,0 +1,10 @@
+Project 1:
+    ✔ Task1 @done(24-12-03 18:51)
+    ✔ Task2 @started(24-12-03 18:25) @done(24-12-03 18:27) @lasted(2m12s)
+    ✔ Task3 @started(24-12-03 18:46) @done(24-12-03 18:47) @lasted(1m4s)
+    ✘ Task4 @started(24-12-03 18:47) @cancelled(24-12-03 18:47) @wasted(40s)
+
+
+
+
+

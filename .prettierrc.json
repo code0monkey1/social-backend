@@ -1,0 +1,8 @@
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "prettier.configPath": ".prettierrc.json",
+  "prettier.eslintIntegration": true,
+  "prettier.formatOnSave": true
+}
+ 

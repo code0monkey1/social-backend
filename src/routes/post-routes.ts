@@ -12,33 +12,34 @@ import { makePostController } from "../factories/controllers/post-controller-fac
 import { makeUserController } from "../factories/controllers/user-controller-factory";
 
 const router = Router();
+
 const upload = multer({
-    dest: "uploads/",
-    limits: {
-        fileSize: 16 * 1024 * 1024, //16mb
-    },
+  dest: "uploads/",
+  limits: {
+    fileSize: 16 * 1024 * 1024, //16mb
+  },
 });
 
 const postController = makePostController();
 const userController = makeUserController();
 
 router.post(
-    "/",
-    authenticate,
-    upload.single("file"),
-    parseImage,
-    postValidator,
-    postController.createPost,
+  "/",
+  authenticate,
+  upload.single("file"),
+  parseImage,
+  postValidator,
+  postController.createPost,
 );
 
 router.patch(
-    "/:postId",
-    authenticate,
-    upload.single("file"),
-    parseImage,
-    postUpdateValidator,
-    isPoster,
-    postController.updatePost,
+  "/:postId",
+  authenticate,
+  upload.single("file"),
+  parseImage,
+  postUpdateValidator,
+  isPoster,
+  postController.updatePost,
 );
 
 router.delete("/:postId", authenticate, isPoster, postController.deletePost);
@@ -48,10 +49,10 @@ router.get("/:postId/photo", authenticate, postController.photo);
 //comments
 
 router.put(
-    "/:postId/comment",
-    authenticate,
-    commentValidator,
-    postController.comment,
+  "/:postId/comment",
+  authenticate,
+  commentValidator,
+  postController.comment,
 );
 
 router.put("/:postId/uncomment", authenticate, postController.uncomment);
