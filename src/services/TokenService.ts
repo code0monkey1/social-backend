@@ -3,85 +3,85 @@ import { JWTGenerator, JwtPayload } from "../interfaces/jwt/JWTGenerator";
 import { RefreshTokenRepository } from "../repositories/RefreshTokenRepository";
 
 export class TokenService {
-    constructor(
-        private readonly jwtService: JWTGenerator,
-        private readonly refreshTokenRepository: RefreshTokenRepository,
-    ) {}
+  constructor(
+    private readonly jwtService: JWTGenerator,
+    private readonly refreshTokenRepository: RefreshTokenRepository,
+  ) {}
 
-    setAccessToken(res: Response, jwtPayload: JwtPayload) {
-        const token = this.jwtService.generate(jwtPayload, {
-            expiresIn: "1h",
-            jwtId: "accessToken",
-            issuer: "base-backend",
-        });
+  setAccessToken(res: Response, jwtPayload: JwtPayload) {
+    const token = this.jwtService.generate(jwtPayload, {
+      expiresIn: "1h",
+      jwtId: "accessToken",
+      issuer: "base-backend",
+    });
 
-        // return the jwt in the cookie
-        res.cookie("accessToken", token, {
-            domain: "localhost",
-            sameSite: "strict",
-            maxAge: 1000 * 60 * 60, // 1 hour
-            httpOnly: true, // this ensures that the cookie can be only taken by server
-        });
-    }
+    // return the jwt in the cookie
+    res.cookie("accessToken", token, {
+      domain: "localhost",
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60, // 1 hour
+      httpOnly: true, // this ensures that the cookie can be only taken by server
+    });
+  }
 
-    async setRefreshToken(
-        res: Response,
-        jwtPayload: JwtPayload,
-        user: string,
-        isGuest = false,
-    ) {
-        //persist jwt  , should have user and expiry time
-        const savedRefreshToken = await this.persistRefreshToken(user, isGuest);
+  async setRefreshToken(
+    res: Response,
+    jwtPayload: JwtPayload,
+    user: string,
+    isGuest = false,
+  ) {
+    //persist jwt  , should have user and expiry time
+    const savedRefreshToken = await this.persistRefreshToken(user, isGuest);
 
-        const refreshToken = this.generateRefreshToken(
-            jwtPayload,
-            savedRefreshToken._id.toString(),
-        );
+    const refreshToken = this.generateRefreshToken(
+      jwtPayload,
+      savedRefreshToken._id.toString(),
+    );
 
-        // return the jwt in the cookie
-        res.cookie("refreshToken", refreshToken, {
-            domain: "localhost",
-            sameSite: "strict",
-            maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
-            httpOnly: true, // this ensures that the cookie can be only taken by server
-        });
-    }
+    // return the jwt in the cookie
+    res.cookie("refreshToken", refreshToken, {
+      domain: "localhost",
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+      httpOnly: true, // this ensures that the cookie can be only taken by server
+    });
+  }
 
-    generateRefreshToken(jwtPayload: JwtPayload, refreshTokenId: string) {
-        const token = this.jwtService.generate(
-            { ...jwtPayload, refreshTokenId },
-            {
-                expiresIn: "1y",
-                jwtId: refreshTokenId,
-                issuer: "base-backend",
-            },
-        );
+  generateRefreshToken(jwtPayload: JwtPayload, refreshTokenId: string) {
+    const token = this.jwtService.generate(
+      { ...jwtPayload, refreshTokenId },
+      {
+        expiresIn: "1y",
+        jwtId: refreshTokenId,
+        issuer: "base-backend",
+      },
+    );
 
-        return token;
-    }
+    return token;
+  }
 
-    async deleteAllRefreshTokensOfUser(userId: string) {
-        await this.refreshTokenRepository.deleteAllRefreshTokensOfUser(userId);
-    }
-    async persistRefreshToken(
-        user: string,
-        isGuest = false,
-        years_to_persist = 1,
-    ) {
-        //persist jwt  , should have user and expiry time
-        const YEARS = 1000 * 60 * 60 * 24 * 365 * years_to_persist;
+  async deleteAllRefreshTokensOfUser(userId: string) {
+    await this.refreshTokenRepository.deleteAllRefreshTokensOfUser(userId);
+  }
+  async persistRefreshToken(
+    user: string,
+    isGuest = false,
+    years_to_persist = 1,
+  ) {
+    //persist jwt  , should have user and expiry time
+    const YEARS = 1000 * 60 * 60 * 24 * 365 * years_to_persist;
 
-        return await this.refreshTokenRepository.createRefreshToken({
-            user,
-            expiresAt: new Date(Date.now() + YEARS),
-            isGuest,
-        });
-    }
+    return await this.refreshTokenRepository.createRefreshToken({
+      user,
+      expiresAt: new Date(Date.now() + YEARS),
+      isGuest,
+    });
+  }
 
-    async deleteRefreshTokenOfUser(refreshTokenId: string, userId: string) {
-        return await this.refreshTokenRepository.deleteRefreshTokenOfUser(
-            refreshTokenId,
-            userId,
-        );
-    }
+  async deleteRefreshTokenOfUser(refreshTokenId: string, userId: string) {
+    return await this.refreshTokenRepository.deleteRefreshTokenOfUser(
+      refreshTokenId,
+      userId,
+    );
+  }
 }

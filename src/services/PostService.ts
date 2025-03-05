@@ -3,69 +3,66 @@ import { CommentType, PostType } from "../models/post.model";
 import { PostRepository } from "../repositories/PostRepository";
 
 export class PostService {
-    constructor(private readonly postRepository: PostRepository) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
-    getFeed = async (following: string[]) => {
-        return await this.postRepository.getFeed(following);
-    };
-    createPost = async (postBody: Partial<PostType>) => {
-        return await this.postRepository.cratePost(postBody);
-    };
+  getFeed = async (following: string[]) => {
+    return await this.postRepository.getFeed(following);
+  };
+  createPost = async (postBody: Partial<PostType>) => {
+    return await this.postRepository.cratePost(postBody);
+  };
 
-    updatePost = async (postId: string, postBody: Partial<PostType>) => {
-        return await this.postRepository.updatePost(postId, postBody);
-    };
+  updatePost = async (postId: string, postBody: Partial<PostType>) => {
+    return await this.postRepository.updatePost(postId, postBody);
+  };
 
-    findByIdAndDelete = async (postId: string) => {
-        return await this.postRepository.findByIdAndDelete(postId);
-    };
+  findByIdAndDelete = async (postId: string) => {
+    return await this.postRepository.findByIdAndDelete(postId);
+  };
 
-    findByUserId = async (userId: string) => {
-        return await this.postRepository.findByUserId(userId);
-    };
+  findByUserId = async (userId: string) => {
+    return await this.postRepository.findByUserId(userId);
+  };
 
-    findById = async (postId: string) => {
-        return await this.postRepository.findById(postId);
-    };
+  findById = async (postId: string) => {
+    return await this.postRepository.findById(postId);
+  };
 
-    comment = async (postId: string, comment: CommentType) => {
-        //add createdAt
-        comment.createdAt = new Date(Date.now());
+  comment = async (postId: string, comment: CommentType) => {
+    //add createdAt
+    comment.createdAt = new Date(Date.now());
 
-        return await this.postRepository.comment(postId, comment);
-    };
-    uncomment = async (post: PostType, commentId: string, userId: string) => {
-        const comment = post.comments.find(
-            (comment) => comment._id.toString() === commentId,
-        );
+    return await this.postRepository.comment(postId, comment);
+  };
+  uncomment = async (post: PostType, commentId: string, userId: string) => {
+    const comment = post.comments.find(
+      (comment) => comment._id.toString() === commentId,
+    );
 
-        if (!comment) {
-            throw createHttpError(404, "The comment does not exist");
-        }
+    if (!comment) {
+      throw createHttpError(404, "The comment does not exist");
+    }
 
-        if (comment.postedBy.toString() !== userId) {
-            throw createHttpError(403, "user is unauthorized");
-        }
+    if (comment.postedBy.toString() !== userId) {
+      throw createHttpError(403, "user is unauthorized");
+    }
 
-        return await this.postRepository.uncomment(
-            post._id.toString(),
-            commentId,
-        );
-    };
+    return await this.postRepository.uncomment(post._id.toString(), commentId);
+  };
 
-    like = async (post: PostType, userId: string) => {
-        if (post.postedBy.toString() === userId) {
-            throw createHttpError(403, "user is unauthorized");
-        }
+  like = async (post: PostType, userId: string) => {
+    if (post.postedBy.toString() === userId) {
+      throw createHttpError(403, "user is unauthorized");
+    }
 
-        return await this.postRepository.like(post._id.toString(), userId);
-    };
+    return await this.postRepository.like(post._id.toString(), userId);
+  };
 
-    unlike = async (post: PostType, userId: string) => {
-        if (post.postedBy.toString() === userId) {
-            throw createHttpError(403, "user is unauthorized");
-        }
+  unlike = async (post: PostType, userId: string) => {
+    if (post.postedBy.toString() === userId) {
+      throw createHttpError(403, "user is unauthorized");
+    }
 
-        return await this.postRepository.unlike(post._id.toString(), userId);
-    };
+    return await this.postRepository.unlike(post._id.toString(), userId);
+  };
 }

@@ -1,8 +1,8 @@
 import {
-    createAccessToken,
-    createPost,
-    createUser,
-    userData,
+  createAccessToken,
+  createPost,
+  createUser,
+  userData,
 } from "./../testHelpers/index";
 import { db } from "../../src/utils/db";
 import supertest from "supertest";
@@ -13,113 +13,113 @@ import path from "path";
 
 const api = supertest(app);
 describe("GET  /posts/:postId/photo ", () => {
-    beforeAll(async () => {
-        await db.connect();
+  beforeAll(async () => {
+    await db.connect();
+  });
+
+  afterEach(async () => {
+    await db.clear();
+  });
+  afterAll(async () => {
+    await db.disconnect();
+  });
+  describe("happy path", () => {
+    it("should return json response", async () => {
+      const BASE_URL = getBaseUrl("1");
+
+      await api.get(BASE_URL).expect("Content-Type", /json/);
     });
 
-    afterEach(async () => {
-        await db.clear();
-    });
-    afterAll(async () => {
-        await db.disconnect();
-    });
-    describe("happy path", () => {
-        it("should return json response", async () => {
-            const BASE_URL = getBaseUrl("1");
+    it("should return the photo of the post", async () => {
+      const user = await createUser(userData);
 
-            await api.get(BASE_URL).expect("Content-Type", /json/);
-        });
+      let fileData = fs.readFileSync(
+        path.resolve(__dirname, "../test-data/test-pic.png"),
+      );
 
-        it("should return the photo of the post", async () => {
-            const user = await createUser(userData);
+      const photo = {
+        data: fileData,
+        contentType: "image/png", // replace it with actual contentType
+      };
 
-            let fileData = fs.readFileSync(
-                path.resolve(__dirname, "../test-data/test-pic.png"),
-            );
+      const post = await createPost({
+        postedBy: user._id.toString(),
+        text: "some_text",
+        photo,
+      });
 
-            const photo = {
-                data: fileData,
-                contentType: "image/png", // replace it with actual contentType
-            };
+      const BASE_URL = getBaseUrl(post._id.toString());
 
-            const post = await createPost({
-                postedBy: user._id.toString(),
-                text: "some_text",
-                photo,
-            });
+      const accessToken = await createAccessToken(user);
 
-            const BASE_URL = getBaseUrl(post._id.toString());
+      const response = await api
+        .get(BASE_URL)
+        .set("Cookie", `accessToken=${accessToken}`)
+        .expect("Content-Type", photo.contentType)
+        .expect(200);
 
-            const accessToken = await createAccessToken(user);
-
-            const response = await api
-                .get(BASE_URL)
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect("Content-Type", photo.contentType)
-                .expect(200);
-
-            expect(response.body).toBeDefined();
-            const responseBuffer = Buffer.from(response.body, "base64");
-            const originalBuffer = Buffer.from(
-                photo.data.toString("base64"),
-                "base64",
-            );
-            expect(Buffer.compare(responseBuffer, originalBuffer)).toEqual(0);
-        });
-
-        it("should null if no photo is present in the post ", async () => {
-            const user = await createUser(userData);
-
-            const post = await createPost({
-                postedBy: user._id.toString(),
-                text: "some_text",
-            });
-
-            const BASE_URL = getBaseUrl(post._id.toString());
-
-            const accessToken = await createAccessToken(user);
-
-            const response = await api
-                .get(BASE_URL)
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(200);
-
-            expect(response.body.data).toBeUndefined();
-            expect(response.body.contentType).toBeUndefined();
-        });
+      expect(response.body).toBeDefined();
+      const responseBuffer = Buffer.from(response.body, "base64");
+      const originalBuffer = Buffer.from(
+        photo.data.toString("base64"),
+        "base64",
+      );
+      expect(Buffer.compare(responseBuffer, originalBuffer)).toEqual(0);
     });
 
-    describe("unhappy path", () => {
-        it("should return 401 unauthorized , in case an token is not supplied", async () => {
-            const user = await createUser(userData);
+    it("should null if no photo is present in the post ", async () => {
+      const user = await createUser(userData);
 
-            const post = await createPost({
-                postedBy: user._id.toString(),
-                text: "some_text",
-            });
+      const post = await createPost({
+        postedBy: user._id.toString(),
+        text: "some_text",
+      });
 
-            const BASE_URL = getBaseUrl(post._id.toString());
+      const BASE_URL = getBaseUrl(post._id.toString());
 
-            await api.get(BASE_URL).expect(401);
-        });
+      const accessToken = await createAccessToken(user);
 
-        it("should return 404 , in case the post is not found", async () => {
-            const postId = DELETED_USER_ID;
+      const response = await api
+        .get(BASE_URL)
+        .set("Cookie", `accessToken=${accessToken}`)
+        .expect(200);
 
-            const user = await createUser(userData);
-            const BASE_URL = getBaseUrl(postId);
-
-            const accessToken = await createAccessToken(user);
-
-            await api
-                .get(BASE_URL)
-                .set("Cookie", `accessToken=${accessToken}`)
-                .expect(404);
-        });
+      expect(response.body.data).toBeUndefined();
+      expect(response.body.contentType).toBeUndefined();
     });
+  });
+
+  describe("unhappy path", () => {
+    it("should return 401 unauthorized , in case an token is not supplied", async () => {
+      const user = await createUser(userData);
+
+      const post = await createPost({
+        postedBy: user._id.toString(),
+        text: "some_text",
+      });
+
+      const BASE_URL = getBaseUrl(post._id.toString());
+
+      await api.get(BASE_URL).expect(401);
+    });
+
+    it("should return 404 , in case the post is not found", async () => {
+      const postId = DELETED_USER_ID;
+
+      const user = await createUser(userData);
+      const BASE_URL = getBaseUrl(postId);
+
+      const accessToken = await createAccessToken(user);
+
+      await api
+        .get(BASE_URL)
+        .set("Cookie", `accessToken=${accessToken}`)
+        .expect(404);
+    });
+  });
 });
 
 const getBaseUrl = (postId: string) => {
-    const BASE_URL = `/posts/${postId}/photo`;
-    return BASE_URL;
+  const BASE_URL = `/posts/${postId}/photo`;
+  return BASE_URL;
 };

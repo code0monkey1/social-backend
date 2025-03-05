@@ -2,11 +2,11 @@ import { db } from "./../../../src/utils/db";
 import supertest from "supertest";
 import app from "../../../src/app";
 import {
-    createAccessToken,
-    createUser,
-    deleteUser,
-    getUserById,
-    userData,
+  createAccessToken,
+  createUser,
+  deleteUser,
+  getUserById,
+  userData,
 } from "../../testHelpers";
 
 import User from "../../../src/models/user.model";
@@ -14,136 +14,136 @@ const api = supertest(app);
 const BASE_URL = "/users";
 
 describe("PATCH /users/:userId/follow", () => {
-    beforeAll(async () => {
-        await db.connect();
+  beforeAll(async () => {
+    await db.connect();
+  });
+
+  afterEach(async () => {
+    await db.clear();
+  });
+
+  afterAll(async () => {
+    await db.disconnect();
+  });
+
+  describe("happy path", () => {
+    it("should return json response ", async () => {
+      const userId = 12;
+      await api
+        .patch(`${BASE_URL}/${userId}/follow`)
+        .expect("Content-Type", /json/);
     });
 
-    afterEach(async () => {
-        await db.clear();
+    //DONE:should return 200 , with the followed users id, in the followed list
+    it("should have the followed userId, in the FOLLOWED list", async () => {
+      const user = await createUser(userData);
+      const userToFollow = await createUser({
+        ...userData,
+        email: "secondUser@gmail.com",
+      });
+
+      const accessToken = await createAccessToken(user);
+
+      await api
+        .patch(`${BASE_URL}/${userToFollow._id}/follow`)
+        .set("Cookie", [`accessToken=${accessToken}`])
+        .expect("Content-Type", /json/)
+        .expect(200);
+
+      const savedUser = await getUserById(user._id.toString());
+
+      const received = savedUser.following!;
+      const expected = userToFollow._id;
+
+      expect(received).toContainEqual(expected);
+
+      expect(received.length).toBe(1);
     });
 
-    afterAll(async () => {
-        await db.disconnect();
+    //DONE: should have the userId, in the FOLLOWERS list of the followed user;
+    it("should have the userId, in the FOLLOWERS list of the followed user", async () => {
+      const user = await createUser(userData);
+      const userToFollow = await createUser({
+        ...userData,
+        email: "secondUser@gmail.com",
+      });
+
+      const accessToken = await createAccessToken(user);
+
+      await api
+        .patch(`${BASE_URL}/${userToFollow._id}/follow`)
+        .set("Cookie", [`accessToken=${accessToken}`])
+        .expect("Content-Type", /json/)
+        .expect(200);
+
+      const followedUser = await getUserById(userToFollow._id.toString());
+      const received = followedUser.followers!;
+      const expected = user._id;
+
+      expect(received).toContainEqual(expected);
     });
 
-    describe("happy path", () => {
-        it("should return json response ", async () => {
-            const userId = 12;
-            await api
-                .patch(`${BASE_URL}/${userId}/follow`)
-                .expect("Content-Type", /json/);
-        });
+    //DONE : should not follow , if the the target user is already followed
 
-        //DONE:should return 200 , with the followed users id, in the followed list
-        it("should have the followed userId, in the FOLLOWED list", async () => {
-            const user = await createUser(userData);
-            const userToFollow = await createUser({
-                ...userData,
-                email: "secondUser@gmail.com",
-            });
+    it("should not follow , if the user is already followed", async () => {
+      const user = await createUser(userData);
 
-            const accessToken = await createAccessToken(user);
+      const userToFollow = await createUser({
+        ...userData,
+        email: "secondUser@gmail.com",
+      });
+      const accessToken = await createAccessToken(user);
 
-            await api
-                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .expect("Content-Type", /json/)
-                .expect(200);
+      const savedUser = await User.findById(user._id.toString());
 
-            const savedUser = await getUserById(user._id.toString());
+      savedUser!.following!.push(userToFollow._id.toString());
 
-            const received = savedUser.following!;
-            const expected = userToFollow._id;
+      await savedUser!.save();
 
-            expect(received).toContainEqual(expected);
+      await api
+        .patch(`${BASE_URL}/${userToFollow._id}/follow`)
+        .set("Cookie", [`accessToken=${accessToken}`])
+        .expect("Content-Type", /json/)
+        .expect(200);
 
-            expect(received.length).toBe(1);
-        });
+      expect(savedUser!.following).toHaveLength(1);
+    });
+  });
 
-        //DONE: should have the userId, in the FOLLOWERS list of the followed user;
-        it("should have the userId, in the FOLLOWERS list of the followed user", async () => {
-            const user = await createUser(userData);
-            const userToFollow = await createUser({
-                ...userData,
-                email: "secondUser@gmail.com",
-            });
+  describe("unhappy path", () => {
+    //DONE:should return 401 unauthorized access,when no auth token
+    it("should return 401 unauthorized access,when no auth token", async () => {
+      const userToFollow = await createUser({
+        ...userData,
+        email: "secondUser@gmail.com",
+      });
 
-            const accessToken = await createAccessToken(user);
-
-            await api
-                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .expect("Content-Type", /json/)
-                .expect(200);
-
-            const followedUser = await getUserById(userToFollow._id.toString());
-            const received = followedUser.followers!;
-            const expected = user._id;
-
-            expect(received).toContainEqual(expected);
-        });
-
-        //DONE : should not follow , if the the target user is already followed
-
-        it("should not follow , if the user is already followed", async () => {
-            const user = await createUser(userData);
-
-            const userToFollow = await createUser({
-                ...userData,
-                email: "secondUser@gmail.com",
-            });
-            const accessToken = await createAccessToken(user);
-
-            const savedUser = await User.findById(user._id.toString());
-
-            savedUser!.following!.push(userToFollow._id.toString());
-
-            await savedUser!.save();
-
-            await api
-                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .expect("Content-Type", /json/)
-                .expect(200);
-
-            expect(savedUser!.following).toHaveLength(1);
-        });
+      await api
+        .patch(`${BASE_URL}/${userToFollow._id}/follow`)
+        .expect("Content-Type", /json/)
+        .expect(401);
     });
 
-    describe("unhappy path", () => {
-        //DONE:should return 401 unauthorized access,when no auth token
-        it("should return 401 unauthorized access,when no auth token", async () => {
-            const userToFollow = await createUser({
-                ...userData,
-                email: "secondUser@gmail.com",
-            });
+    //DONE:should return 404 , when user to follow does not exist
+    it("should return 404 , when user to follow does not exist", async () => {
+      const savedUser = await createUser(userData);
 
-            await api
-                .patch(`${BASE_URL}/${userToFollow._id}/follow`)
-                .expect("Content-Type", /json/)
-                .expect(401);
-        });
+      const userToFollow = await createUser({
+        ...userData,
+        email: "secondUser@gmail.com",
+      });
 
-        //DONE:should return 404 , when user to follow does not exist
-        it("should return 404 , when user to follow does not exist", async () => {
-            const savedUser = await createUser(userData);
+      await deleteUser(userToFollow._id.toString());
 
-            const userToFollow = await createUser({
-                ...userData,
-                email: "secondUser@gmail.com",
-            });
+      const accessToken = await createAccessToken(savedUser);
 
-            await deleteUser(userToFollow._id.toString());
+      await api
+        .patch(`${BASE_URL}/${userToFollow._id.toString()}/follow`)
+        .set("Cookie", [`accessToken=${accessToken}`])
+        .expect("Content-Type", /json/)
+        .expect(404);
 
-            const accessToken = await createAccessToken(savedUser);
-
-            await api
-                .patch(`${BASE_URL}/${userToFollow._id.toString()}/follow`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .expect("Content-Type", /json/)
-                .expect(404);
-
-            expect(savedUser.following).toHaveLength(0);
-        });
+      expect(savedUser.following).toHaveLength(0);
     });
+  });
 });

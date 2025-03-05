@@ -1,3 +1,3 @@
 export interface JWTVerifier {
-    verify(jwt: string): string | null;
+  verify(jwt: string): string | null;
 }

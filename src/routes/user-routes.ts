@@ -11,19 +11,19 @@ const router = Router();
 const userController = makeUserController();
 
 const upload = multer({
-    dest: "uploads/",
-    limits: {
-        fileSize: 16 * 1024 * 1024, //16mb
-    },
+  dest: "uploads/",
+  limits: {
+    fileSize: 16 * 1024 * 1024, //16mb
+  },
 });
 
 router.patch(
-    "/:userId",
-    authenticate,
-    isUser,
-    upload.single("file"),
-    parseImage,
-    userController.updateById,
+  "/:userId",
+  authenticate,
+  isUser,
+  upload.single("file"),
+  parseImage,
+  userController.updateById,
 );
 
 router.get("/", authenticate, userController.findAll);
@@ -33,34 +33,34 @@ router.delete("/:userId", authenticate, isUser, userController.deleteById);
 // follow routes
 
 router.patch(
-    "/:userId/follow",
-    authenticate,
-    userController.addFollowing,
-    userController.addFollower,
+  "/:userId/follow",
+  authenticate,
+  userController.addFollowing,
+  userController.addFollower,
 );
 
 router.patch(
-    "/:userId/unfollow",
-    authenticate,
-    userController.removeFollowing,
-    userController.removeFollower,
+  "/:userId/unfollow",
+  authenticate,
+  userController.removeFollowing,
+  userController.removeFollower,
 );
 
 // user follow recommendations
 
 router.get(
-    "/:userId/recommendations",
-    authenticate,
-    userController.recommendations,
+  "/:userId/recommendations",
+  authenticate,
+  userController.recommendations,
 );
 
 // user avatar route
 
 router.get(
-    "/:userId/avatar",
-    authenticate,
-    userController.avatar,
-    userController.defaultAvatar,
+  "/:userId/avatar",
+  authenticate,
+  userController.avatar,
+  userController.defaultAvatar,
 );
 
 // common middleware triggered at the start of all userId routes
