@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: [Config.CLIENT_URL!],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    credentials: true, // this will ensure that we get the credential cookies from the frontend
   }),
 );
 
