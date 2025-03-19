@@ -13,23 +13,6 @@ export class AuthController {
     private readonly logger: Logger,
   ) {}
 
-  self = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // get userId from cookie
-      const { userId } = (req as AuthRequest).auth;
-
-      const user = await this.userService.findById(userId);
-
-      if (!user) {
-        throw createHttpError(404, "User not found");
-      }
-
-      res.json(user);
-    } catch (error) {
-      next(error);
-    }
-  };
-
   register = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let { name, email, password } = req.body as UserData;
@@ -192,6 +175,11 @@ export interface AuthRequest extends Request {
   };
 }
 
+export interface UserRequest extends Request {
+  user: {
+    userId: string;
+  };
+}
 export interface RegisterRequest extends Request {
   body: UserData;
 }
